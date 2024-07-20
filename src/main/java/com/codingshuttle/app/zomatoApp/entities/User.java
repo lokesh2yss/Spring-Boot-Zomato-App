@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.LazyGroup;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,14 +31,19 @@ public class User {
     @Column(unique = true)
     private String phone;
 
+    private String password;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
     private LocalDate dob;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Address> addresses;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "default_address_id")
     private Address defaultAddress;
 
     @Enumerated(EnumType.STRING)

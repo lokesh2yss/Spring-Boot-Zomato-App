@@ -1,31 +1,24 @@
-package com.codingshuttle.app.zomatoApp.entities;
+package com.codingshuttle.app.zomatoApp.dto;
 
 import com.codingshuttle.app.zomatoApp.entities.enums.RestaurantCategory;
 import com.codingshuttle.app.zomatoApp.entities.enums.RestaurantCuisine;
 import com.codingshuttle.app.zomatoApp.entities.enums.RestaurantOpenStatus;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Time;
 import java.util.List;
 
-@Entity
-@Getter
-@Setter
-public class Restaurant {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class RestaurantDto {
     private Double rating;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private UserDto user;
 
-    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<MenuItem> menu;
+    private List<MenuItemDto> menu;
 
     private Time openingTime;
 

@@ -21,6 +21,10 @@ public class MenuItem {
 
     private String title;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn( name = "restaurant_id")
+    private Restaurant restaurant;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
