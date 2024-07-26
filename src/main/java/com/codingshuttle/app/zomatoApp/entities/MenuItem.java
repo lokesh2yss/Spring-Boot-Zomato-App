@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@Table(name="menu_items")
 public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +23,7 @@ public class MenuItem {
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn( name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
     @Column(columnDefinition = "TEXT")
@@ -32,6 +33,7 @@ public class MenuItem {
 
     @Enumerated(EnumType.STRING)
     private MenuItemStatus status;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

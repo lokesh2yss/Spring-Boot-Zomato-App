@@ -8,12 +8,14 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Entity
 @Getter
 @Setter
+@Table(name="order_requests")
 public class OrderRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,13 +23,14 @@ public class OrderRequest {
 
     private Double price;
 
-    private Map<List<MenuItem>, Integer> items;
+    @OneToMany(mappedBy = "orderRequest", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<OrderItem> orderItems;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="customer_id")
     private Customer customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="restaurant_id")
     private Restaurant restaurant;
 
@@ -35,7 +38,7 @@ public class OrderRequest {
     private PaymentMethod paymentMethod;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address deliveryAddress;
 
     @Enumerated(EnumType.STRING)

@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(name="wallets")
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +19,8 @@ public class Wallet {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private List<Payment> payments;
+    @OneToMany(mappedBy = "wallet", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<WalletTransaction> transactions;
 
     private Double balance;
 }

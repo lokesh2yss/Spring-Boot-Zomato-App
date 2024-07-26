@@ -43,7 +43,7 @@ public class User {
     private List<Address> addresses;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "default_address_id")
+    @JoinColumn(name = "default_address_id", referencedColumnName = "id")
     private Address defaultAddress;
 
     @Enumerated(EnumType.STRING)

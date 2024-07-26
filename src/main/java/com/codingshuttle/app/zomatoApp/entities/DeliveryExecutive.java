@@ -10,12 +10,13 @@ import org.locationtech.jts.geom.Point;
 @Entity
 @Getter
 @Setter
+@Table(name="delivery_executives")
 public class DeliveryExecutive {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 

@@ -7,12 +7,13 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Table(name="admins")
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 }

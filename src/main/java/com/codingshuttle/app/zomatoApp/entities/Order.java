@@ -9,38 +9,45 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Entity
 @Getter
 @Setter
+@Table(name="orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double price;
-
-    private Map<List<MenuItem>, Integer> items;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="customer_id")
     private Customer customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="restaurant_id")
     private Restaurant restaurant;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "delivery_executive_id")
     private DeliveryExecutive deliveryExecutive;
+
+    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<OrderItem> orderItems;
+
+    @Column(nullable = false)
+    private Double totalAmount;
+
+    @OneToOne(mappedBy = "order")
+    private Payment payment;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address deliveryAddress;
 
     @Enumerated(EnumType.STRING)
