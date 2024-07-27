@@ -1,5 +1,6 @@
 package com.codingshuttle.app.zomatoApp.configs;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +18,6 @@ public class RestClientConfig {
 
     @Value("${GeoLocationFromAddressService.base.url}")
     private String GEO_FROM_ADDRESS_BASE_URL;
-
-
     @Bean
     @Qualifier("ipApiRestClient")
     public RestClient getIpApiRestClient() {
@@ -34,6 +33,18 @@ public class RestClientConfig {
     @Bean
     @Qualifier("googleMapRestClient")
     public RestClient getGoogleMapRestClient() {
+        return RestClient.builder()
+                .baseUrl(GEO_FROM_ADDRESS_BASE_URL)
+                .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    throw new RuntimeException("Server Error Occurred");
+                })
+                .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .build();
+    }
+
+    @Bean
+    @Qualifier("openCageRestClient")
+    public RestClient getOpenCageRestClient() {
         return RestClient.builder()
                 .baseUrl(GEO_FROM_ADDRESS_BASE_URL)
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {

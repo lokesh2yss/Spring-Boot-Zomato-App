@@ -1,9 +1,11 @@
 package com.codingshuttle.app.zomatoApp.services;
 
+import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import org.locationtech.jts.geom.Point;
 
 public interface GeoLocationService {
-    Point getIpApiGeolocation(String ip);
+    PointDto getIpApiGeolocation(String ip);
 
-    Point getGoogleGeolocation(String address);
+    PointDto getOpenCageGeolocation(String address);
+    PointDto getGoogleGeolocation(String address);
 }

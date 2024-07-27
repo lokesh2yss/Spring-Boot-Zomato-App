@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GeocodingResponse {
+public class GoogleMapGeocodingResponse {
     private List<Result> results;
     private String status;
 
