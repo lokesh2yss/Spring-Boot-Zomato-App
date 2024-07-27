@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddressDto {
-    private UserDto user;
-
     private String address1;
 
     private String address2;

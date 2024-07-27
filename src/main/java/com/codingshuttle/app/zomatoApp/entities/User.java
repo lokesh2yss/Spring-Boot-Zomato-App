@@ -42,7 +42,7 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Address> addresses;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "default_address_id", referencedColumnName = "id")
     private Address defaultAddress;
 

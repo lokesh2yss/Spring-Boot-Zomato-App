@@ -22,9 +22,15 @@ public interface CustomerService {
 
     OrderDto cancelOrder(Long orderId);
 
-    AddressDto addCustomerAddress(AddressDto addressDto);
+    AddressDto addCustomerAddress(Long customerId, AddressDto addressDto);
 
-    AddressDto deleteCustomerAddress(Long addressId);
+    AddressDto updateCustomerAddress(Long customerId, Long addressId, AddressDto addressDto);
+
+    boolean deleteCustomerAddress(Long customerId, Long addressId);
+
+    AddressDto getCustomerDefaultAddress(Long  customerId);
+
+    AddressDto setCustomerDefaultAddress(Long  customerId, Long addressId);
 
     List<OrderDto> getCustomersAllCurrentOrders(Long  customerId);
 
@@ -32,9 +38,6 @@ public interface CustomerService {
 
     boolean addFundsToWallet(Long  customerId, double amount);
 
-    AddressDto getDefaultAddress(Long  customerId);
-
-    AddressDto setDefaultAddress(Long  customerId, AddressDto addressDto);
 
     OrderStatus getCustomerOrderStatus(Long  orderId);
 

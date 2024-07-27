@@ -1,5 +1,6 @@
 package com.codingshuttle.app.zomatoApp.services;
 
+import com.codingshuttle.app.zomatoApp.dto.AddressDto;
 import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
 import com.codingshuttle.app.zomatoApp.dto.OrderDto;
 import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
@@ -30,4 +31,14 @@ public interface RestaurantService {
     List<RestaurantDto> getNearbyRestaurantsByCustomer(Point customerLocation);
 
     List<MenuItemDto> getRestaurantMenu(Long restaurantId);
+
+    AddressDto addRestaurantAddress(Long restaurantId, AddressDto addressDto);
+
+    AddressDto updateRestaurantAddress(Long restaurantId, Long addressId, AddressDto addressDto);
+
+    boolean deleteRestaurantAddress(Long restaurantId, Long addressId);
+
+    AddressDto getRestaurantDefaultAddress(Long  restaurantId);
+
+    AddressDto setRestaurantDefaultAddress(Long  restaurantId, Long addressId);
 }
