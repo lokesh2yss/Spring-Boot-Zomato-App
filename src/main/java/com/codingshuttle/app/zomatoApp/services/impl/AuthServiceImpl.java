@@ -1,12 +1,17 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.dto.*;
+import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
+import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.Role;
+import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.exceptions.RuntimeConflictException;
 import com.codingshuttle.app.zomatoApp.repositories.UserRepository;
 import com.codingshuttle.app.zomatoApp.services.AuthService;
 import com.codingshuttle.app.zomatoApp.services.CustomerService;
+import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
+import com.codingshuttle.app.zomatoApp.services.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final CustomerService customerService;
+    private final RestaurantService restaurantService;
+    private final DeliveryExecutiveService deliveryExecutiveService;
     @Override
     public String login(String email, String password) {
         return null;
@@ -39,13 +46,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public RestaurantDto onboardRestaurant(Long restaurantId) {
-        return null;
+    public RestaurantDto onboardRestaurant(Long userId) {
+        User user = getUserById(userId);
+        user.setRoles(Set.of(Role.RESTAURANT));
+        User savedUser = userRepository.save(user);
+        Restaurant restaurant = new Restaurant();
+        restaurant.setUser(savedUser);
+
+        return modelMapper.map(restaurant, RestaurantDto.class);
     }
 
     @Override
-    public DeliveryExecutiveDto onboardDeliveryExecutive(Long deliveryExecutiveId) {
-        return null;
+    public DeliveryExecutiveDto onboardDeliveryExecutive(Long userId) {
+        User user = getUserById(userId);
+        user.setRoles(Set.of(Role.DELIVERY_EXECUTIVE));
+        User savedUser = userRepository.save(user);
+        DeliveryExecutive deliveryExecutive = new DeliveryExecutive();
+        deliveryExecutive.setUser(savedUser);
+
+        return modelMapper.map(deliveryExecutive, DeliveryExecutiveDto.class);
     }
 
     @Override
@@ -71,5 +90,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean banRestaurant(Long restaurantId) {
         return false;
+    }
+
+    private User getUserById(Long userId) {
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id="+userId));
     }
 }

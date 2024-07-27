@@ -9,9 +9,9 @@ public interface AuthService {
 
     UserDto signup(SignupDto signupDto);
 
-    RestaurantDto onboardRestaurant(Long restaurantId);
+    RestaurantDto onboardRestaurant(Long userId);
 
-    DeliveryExecutiveDto onboardDeliveryExecutive(Long deliveryExecutiveId);
+    DeliveryExecutiveDto onboardDeliveryExecutive(Long userId);
 
     List<RestaurantDto> getAllRestaurants();
 
