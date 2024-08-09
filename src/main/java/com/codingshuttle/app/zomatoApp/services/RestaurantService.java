@@ -1,9 +1,6 @@
 package com.codingshuttle.app.zomatoApp.services;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderDto;
-import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import org.locationtech.jts.geom.Point;
 
 import java.awt.print.Pageable;
@@ -26,11 +23,7 @@ public interface RestaurantService {
 
     boolean rejectOrderCancellation(Long orderId);
 
-    Point getDeliveryExecutiveLiveLocation(Long orderId);
-
-    List<OrderDto> getAllOrdersByCustomer(Long customerId);
-
-    List<OrderDto> getOrderHistory(Pageable pageable);
+    PointDto getDeliveryExecutiveLiveLocation(Long orderId);
 
     List<RestaurantDto> getNearbyRestaurantsByCustomer(Point customerLocation);
 

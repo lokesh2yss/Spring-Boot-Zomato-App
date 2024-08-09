@@ -1,15 +1,13 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderDto;
-import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.entities.MenuItem;
 import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.RestaurantRepository;
 import com.codingshuttle.app.zomatoApp.services.AddressService;
+import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
 import com.codingshuttle.app.zomatoApp.services.MenuItemService;
 import com.codingshuttle.app.zomatoApp.services.RestaurantService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +26,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final ModelMapper modelMapper;
     private final AddressService addressService;
     private final MenuItemService menuItemService;
+    private final DeliveryExecutiveService deliveryExecutiveService;
     @Override
     public MenuItemDto addMenuItem(Long restaurantId, MenuItemDto menuItemDto) {
         Restaurant restaurant = getRestaurantById(restaurantId);
@@ -93,18 +92,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Point getDeliveryExecutiveLiveLocation(Long orderId) {
-        return null;
-    }
-
-    @Override
-    public List<OrderDto> getAllOrdersByCustomer(Long customerId) {
-        return null;
-    }
-
-    @Override
-    public List<OrderDto> getOrderHistory(Pageable pageable) {
-        return null;
+    public PointDto getDeliveryExecutiveLiveLocation(Long orderId) {
+        return deliveryExecutiveService.getDeliveryExecutiveLiveLocation(orderId);
     }
 
     @Override

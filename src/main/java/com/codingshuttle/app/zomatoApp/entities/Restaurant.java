@@ -6,6 +6,7 @@ import com.codingshuttle.app.zomatoApp.entities.enums.RestaurantOpenStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.locationtech.jts.geom.Point;
 
 import java.sql.Time;
 import java.util.List;
@@ -30,6 +31,9 @@ public class Restaurant {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(columnDefinition = "Geometry(Point, 4326)")
+    private Point location;
 
     private Time openingTime;
 
