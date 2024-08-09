@@ -5,10 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class AdminDto {
+@NoArgsConstructor
+public class OrderItemDto {
     private Long id;
 
-    private UserDto user;
+    private OrderDto order;
+
+    private OrderRequestDto orderRequest;
+
+    private MenuItemDto menuItem;
+
+    private Integer quantity;
 }

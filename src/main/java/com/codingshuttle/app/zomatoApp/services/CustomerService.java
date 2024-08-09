@@ -1,8 +1,6 @@
 package com.codingshuttle.app.zomatoApp.services;
 
 import com.codingshuttle.app.zomatoApp.dto.*;
-import com.codingshuttle.app.zomatoApp.entities.Order;
-import com.codingshuttle.app.zomatoApp.entities.Review;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import org.locationtech.jts.geom.Point;

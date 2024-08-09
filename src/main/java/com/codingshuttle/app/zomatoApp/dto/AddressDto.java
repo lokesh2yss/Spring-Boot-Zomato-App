@@ -3,8 +3,6 @@ package com.codingshuttle.app.zomatoApp.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +10,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddressDto {
+    private Long id;
+
     private String address1;
 
     private String address2;

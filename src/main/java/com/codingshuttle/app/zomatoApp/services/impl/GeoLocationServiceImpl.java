@@ -1,10 +1,9 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
-import com.codingshuttle.app.zomatoApp.configs.RestClientConfig;
 import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import com.codingshuttle.app.zomatoApp.json.GoogleMapGeocodingResponse;
-import com.codingshuttle.app.zomatoApp.json.IpApiGeocodingResponse;
-import com.codingshuttle.app.zomatoApp.json.OpenCageGeocodingResponse;
+import com.codingshuttle.app.zomatoApp.json.IpApiGeocodingResponseDto;
+import com.codingshuttle.app.zomatoApp.json.OpenCageGeocodingResponseDto;
 import com.codingshuttle.app.zomatoApp.services.GeoLocationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -49,33 +48,27 @@ public class GeoLocationServiceImpl implements GeoLocationService {
     @Override
     public PointDto getIpApiGeolocation(String ip) {
         String url = GEO_FROM_IP_BASE_URL+"/" + ip;
-        String jsonResponse;
+        IpApiGeocodingResponseDto ipApiGeocodingResponseDto;
         try {
-            jsonResponse = ipApiRestClient.get()
+            ipApiGeocodingResponseDto = ipApiRestClient.get()
                     .uri(url)
                     .retrieve()
-                    .body(String.class);
+                    .body(IpApiGeocodingResponseDto.class);
+            double latitude = 0.0;
+            double longitude = 0.0;
+            try {
+                latitude = ipApiGeocodingResponseDto.getLat();
+                longitude = ipApiGeocodingResponseDto.getLon();
+            }catch (Exception e) {
+                log.error(e.getMessage(), (Object) e.getStackTrace());
+                throw new RuntimeException(e);
+            }
+            return getPointFromLatLong(latitude, longitude);
+
         }catch (Exception e) {
             log.error(e.getMessage(), (Object) e.getStackTrace());
             throw new RuntimeException(e);
         }
-        IpApiGeocodingResponse ipApiGeocodingResponse;
-        try {
-            ipApiGeocodingResponse = objectMapper.readValue(jsonResponse, IpApiGeocodingResponse.class);
-        }catch (Exception e) {
-            log.error(e.getMessage(), (Object) e.getStackTrace());
-            throw new RuntimeException(e);
-        }
-        double latitude = 0.0;
-        double longitude = 0.0;
-        try {
-            latitude = ipApiGeocodingResponse.getLat();
-            longitude = ipApiGeocodingResponse.getLon();
-        }catch (Exception e) {
-            log.error(e.getMessage(), (Object) e.getStackTrace());
-            throw new RuntimeException(e);
-        }
-        return getPointFromLatLong(latitude, longitude);
     }
 
     @Override
@@ -83,33 +76,20 @@ public class GeoLocationServiceImpl implements GeoLocationService {
         String encodedAddress = encodeURIComponent(address);
         String url = String.format(GEO_FROM_ADDRESS_BASE_URL, encodedAddress, OPEN_CAGE_API_KEY);
 
-        String jsonResponse = "";
+        OpenCageGeocodingResponseDto jsonResponse = null;
         try {
             jsonResponse = openCageRestClient.get()
                     .uri(url)
                     .retrieve()
-                    .body(String.class);
+                    .body(OpenCageGeocodingResponseDto.class);
+
+            double lat = jsonResponse.getResults().get(0).getGeometry().getLat();
+            double lng = jsonResponse.getResults().get(0).getGeometry().getLng();
+            return getPointFromLatLong(lat, lng);
         }catch(Exception e) {
             log.error(e.getMessage(), (Object) e.getStackTrace());
             throw new RuntimeException(e);
         }
-        OpenCageGeocodingResponse openCageGeocodingResponse;
-        try {
-            openCageGeocodingResponse = objectMapper.readValue(jsonResponse, OpenCageGeocodingResponse.class);
-        }catch (Exception e) {
-            log.error(e.getMessage(), (Object) e.getStackTrace());
-            throw new RuntimeException(e);
-        }
-
-        try {
-                OpenCageGeocodingResponse.Result.Geometry geometry = openCageGeocodingResponse.getResults().getFirst().getGeometry();
-                return getPointFromLatLong(geometry.getLat(), geometry.getLng());
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), (Object) e.getStackTrace());
-            throw new RuntimeException(e);
-        }
-
     }
 
     private String encodeURIComponent(String value) {
@@ -154,6 +134,5 @@ public class GeoLocationServiceImpl implements GeoLocationService {
     private PointDto getPointFromLatLong(double latitude, double longitude) {
         double[] coordinates = {longitude, latitude};
         return new PointDto(coordinates);
-        //return GeometryUtil.createPoint(pointDto);
     }
 }

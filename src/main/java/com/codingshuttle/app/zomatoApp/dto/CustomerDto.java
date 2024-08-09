@@ -8,7 +8,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerDto {
+    private Long id;
+
     private UserDto user;
+
     private Double rating;
 
 }

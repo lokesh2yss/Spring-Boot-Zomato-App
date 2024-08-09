@@ -1,12 +1,12 @@
 package com.codingshuttle.app.zomatoApp.dto;
 
-import com.codingshuttle.app.zomatoApp.entities.Address;
 import com.codingshuttle.app.zomatoApp.entities.enums.AccountStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.Role;
 import com.codingshuttle.app.zomatoApp.entities.enums.VerificationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +16,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
+    private Long id;
+
     private String name;
 
     private String email;
@@ -26,9 +28,9 @@ public class UserDto {
 
     private LocalDate dob;
 
-    private List<Address> addresses;
+    private List<AddressDto> addresses;
 
-    private Address defaultAddress;
+    private AddressDto defaultAddress;
 
     private VerificationStatus emailVerificationStatus;
 

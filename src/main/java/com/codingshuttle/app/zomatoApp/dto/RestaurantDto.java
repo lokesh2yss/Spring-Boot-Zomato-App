@@ -14,11 +14,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RestaurantDto {
+    private Long id;
+
     private Double rating;
 
     private UserDto user;
 
-    private List<MenuItemDto> menu;
+    private List<MenuItemDto> menuItems;
 
     private Time openingTime;
 

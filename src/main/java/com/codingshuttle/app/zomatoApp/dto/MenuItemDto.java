@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MenuItemDto {
+    private Long id;
+
     private Double price;
 
     private String title;
@@ -22,6 +24,7 @@ public class MenuItemDto {
     private Double rating;
 
     private MenuItemStatus status;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

@@ -10,9 +10,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WalletDto {
+    private Long id;
+
     private UserDto user;
 
-    private List<PaymentDto> payments;
+    private List<WalletTransactionDto> transactions;
 
     private Double balance;
 }

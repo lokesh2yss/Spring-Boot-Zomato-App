@@ -8,15 +8,16 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderRequestDto {
+    private Long id;
+
     private Double price;
 
-    private Map<List<MenuItemDto>, Integer> items;
+    private List<OrderItemDto> orderItems;
 
     private CustomerDto customer;
 
