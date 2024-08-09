@@ -4,11 +4,13 @@ import com.codingshuttle.app.zomatoApp.dto.AddressDto;
 import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
 import com.codingshuttle.app.zomatoApp.dto.OrderDto;
 import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
+import com.codingshuttle.app.zomatoApp.entities.MenuItem;
 import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.RestaurantRepository;
 import com.codingshuttle.app.zomatoApp.services.AddressService;
+import com.codingshuttle.app.zomatoApp.services.MenuItemService;
 import com.codingshuttle.app.zomatoApp.services.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.awt.print.Pageable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,21 +27,56 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final ModelMapper modelMapper;
     private final AddressService addressService;
+    private final MenuItemService menuItemService;
     @Override
-    public MenuItemDto addMenuItem(MenuItemDto menuItemDto) {
-        return null;
+    public MenuItemDto addMenuItem(Long restaurantId, MenuItemDto menuItemDto) {
+        Restaurant restaurant = getRestaurantById(restaurantId);
+        MenuItem menuItem = modelMapper.map(menuItemDto, MenuItem.class);
+        menuItem.setRestaurant(restaurant);
+        MenuItem savedMenuItem = menuItemService.addMenuItem(menuItem);
+
+        return modelMapper.map(savedMenuItem, MenuItemDto.class);
     }
 
     @Override
-    public boolean deleteMenuItem(Long menuItemId) {
-        return false;
+    public boolean deleteMenuItem(Long restaurantId, Long menuItemId) {
+        Restaurant restaurant = getRestaurantById(restaurantId);
+        MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
+        if(!menuItem.getRestaurant().equals(restaurant)) {
+            throw new RuntimeException("Cannot delete menu item as it doesn't belong to restaurant with id:"+restaurantId);
+        }
+        return menuItemService.deleteMenuItem(menuItemId);
     }
 
     @Override
-    public MenuItemDto updateMenuItem(MenuItemDto menuItemDto) {
-        return null;
+    public MenuItemDto updateMenuItem(Long restaurantId, Long menuItemId,  MenuItemDto menuItemDto) {
+        Restaurant restaurant = getRestaurantById(restaurantId);
+        MenuItem menuItem = modelMapper.map(menuItemDto, MenuItem.class);
+        if(!menuItem.getRestaurant().equals(restaurant)) {
+            throw new RuntimeException("Cannot update menu item as it doesn't belong to restaurant with id:"+restaurantId);
+        }
+        MenuItem savedMenuItem = menuItemService.updateMenuItem(menuItemId, menuItem);
+        return modelMapper.map(savedMenuItem, MenuItemDto.class);
     }
 
+    @Override
+    public MenuItemDto getMenuItemById(Long restaurantId, Long menuItemId) {
+        Restaurant restaurant = getRestaurantById(restaurantId);
+        MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
+        if(!menuItem.getRestaurant().equals(restaurant)) {
+            throw new RuntimeException("Cannot get the menu item as it doesn't belong to restaurant with id:"+restaurantId);
+        }
+        return modelMapper.map(menuItem, MenuItemDto.class);
+    }
+
+    @Override
+    public List<MenuItemDto> getRestaurantMenu(Long restaurantId) {
+        Restaurant restaurant = getRestaurantById(restaurantId);
+        return restaurant
+                .getMenuItems()
+                .stream().map((element) -> modelMapper.map(element, MenuItemDto.class))
+                .collect(Collectors.toList());
+    }
     @Override
     public boolean cancelOrder(Long orderId) {
         return false;
@@ -74,10 +112,6 @@ public class RestaurantServiceImpl implements RestaurantService {
         return null;
     }
 
-    @Override
-    public List<MenuItemDto> getRestaurantMenu(Long restaurantId) {
-        return null;
-    }
 
     @Override
     public AddressDto addRestaurantAddress(Long restaurantId, AddressDto addressDto) {
@@ -113,5 +147,11 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with id="+restaurantId));
 
         return restaurant.getUser();
+    }
+
+    private Restaurant getRestaurantById(Long restaurantId) {
+        return restaurantRepository.findById(restaurantId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Restaurant not found with id:"+restaurantId));
     }
 }

@@ -19,7 +19,8 @@ public class OrderRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double price;
+    @Column(nullable = false)
+    private Double totalAmount;
 
     @OneToMany(mappedBy = "orderRequest", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<OrderItem> orderItems;

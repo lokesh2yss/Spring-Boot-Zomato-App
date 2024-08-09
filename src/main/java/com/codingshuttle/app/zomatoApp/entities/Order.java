@@ -3,8 +3,7 @@ package com.codingshuttle.app.zomatoApp.entities;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.PaymentMethod;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -13,6 +12,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name="orders")
 public class Order {
     @Id
@@ -37,7 +38,7 @@ public class Order {
     @Column(nullable = false)
     private Double totalAmount;
 
-    @OneToOne(mappedBy = "order")
+    @OneToOne(mappedBy = "order", optional = false)
     private Payment payment;
 
     @Enumerated(EnumType.STRING)

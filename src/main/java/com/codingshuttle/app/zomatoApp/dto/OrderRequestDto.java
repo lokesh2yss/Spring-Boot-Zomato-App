@@ -15,7 +15,7 @@ import java.util.List;
 public class OrderRequestDto {
     private Long id;
 
-    private Double price;
+    private Double totalAmount;
 
     private List<OrderItemDto> orderItems;
 

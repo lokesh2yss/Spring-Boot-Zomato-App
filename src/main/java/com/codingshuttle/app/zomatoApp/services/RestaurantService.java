@@ -10,11 +10,15 @@ import java.awt.print.Pageable;
 import java.util.List;
 
 public interface RestaurantService {
-    MenuItemDto addMenuItem(MenuItemDto menuItemDto);
+    MenuItemDto addMenuItem(Long restaurantId, MenuItemDto menuItemDto);
 
-    boolean deleteMenuItem(Long menuItemId);
+    boolean deleteMenuItem(Long restaurantId, Long menuItemId);
 
-    MenuItemDto updateMenuItem(MenuItemDto menuItemDto);
+    MenuItemDto updateMenuItem(Long restaurantId, Long menuItemId, MenuItemDto menuItemDto);
+
+    MenuItemDto getMenuItemById(Long restaurantId, Long menuItemId);
+
+    List<MenuItemDto> getRestaurantMenu(Long restaurantId);
 
     boolean cancelOrder(Long orderId);
 
@@ -30,7 +34,6 @@ public interface RestaurantService {
 
     List<RestaurantDto> getNearbyRestaurantsByCustomer(Point customerLocation);
 
-    List<MenuItemDto> getRestaurantMenu(Long restaurantId);
 
     AddressDto addRestaurantAddress(Long restaurantId, AddressDto addressDto);
 
@@ -41,4 +44,5 @@ public interface RestaurantService {
     AddressDto getRestaurantDefaultAddress(Long  restaurantId);
 
     AddressDto setRestaurantDefaultAddress(Long  restaurantId, Long addressId);
+
 }
