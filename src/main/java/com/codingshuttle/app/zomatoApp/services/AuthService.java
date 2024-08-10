@@ -1,6 +1,8 @@
 package com.codingshuttle.app.zomatoApp.services;
 
 import com.codingshuttle.app.zomatoApp.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -13,11 +15,11 @@ public interface AuthService {
 
     DeliveryExecutiveDto onboardDeliveryExecutive(Long userId);
 
-    List<RestaurantDto> getAllRestaurants();
+    Page<RestaurantDto> getAllRestaurants(PageRequest pageRequest);
 
-    List<DeliveryExecutiveDto> getAllDeliveryExecutive();
+    Page<DeliveryExecutiveDto> getAllDeliveryExecutive(PageRequest pageRequest);
 
-    List<OrderDto> getAllOrders();
+    Page<OrderDto> getAllOrders(PageRequest pageRequest);
 
     boolean banDeliveryExecutive(Long deliveryExecutiveId);
 

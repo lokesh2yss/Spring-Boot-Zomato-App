@@ -21,24 +21,12 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
     private final AddressService addressService;
-    @Override
-    public List<RestaurantDto> getNearbyRestaurantsByCustomer(CustomerDto customerDto) {
-        return null;
-    }
 
     @Override
-    public List<MenuItemDto> getRestaurantMenu(Long restaurantId) {
-        return null;
-    }
-
-    @Override
-    public MenuItemDto addMenuItemToOrderRequest(OrderRequestDto orderRequestDto, MenuItemDto menuItemDto) {
-        return null;
-    }
-
-    @Override
-    public MenuItemDto deleteMenuItemFromOrderRequest(OrderRequestDto orderRequestDto, MenuItemDto menuItemDto) {
-        return null;
+    public Customer getCustomerById(Long customerId) {
+        return customerRepository.findById(customerId).orElseThrow(
+                () -> new ResourceNotFoundException("Customer not found with id"+customerId)
+        );
     }
 
     @Override

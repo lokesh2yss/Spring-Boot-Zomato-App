@@ -76,7 +76,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         Restaurant restaurant = getRestaurantById(restaurantId);
         return restaurant
                 .getMenuItems()
-                .stream().map((element) -> modelMapper.map(element, MenuItemDto.class))
+                .stream().map((menuItem) -> modelMapper.map(menuItem, MenuItemDto.class))
                 .collect(Collectors.toList());
     }
     @Override
@@ -149,7 +149,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurant.getUser();
     }
 
-    private Restaurant getRestaurantById(Long restaurantId) {
+    @Override
+    public Restaurant getRestaurantById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Restaurant not found with id:"+restaurantId));

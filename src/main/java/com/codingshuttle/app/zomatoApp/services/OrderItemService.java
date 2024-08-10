@@ -1,14 +1,13 @@
-package com.codingshuttle.app.zomatoApp.repositories;
+package com.codingshuttle.app.zomatoApp.services;
 
 import com.codingshuttle.app.zomatoApp.entities.MenuItem;
 import com.codingshuttle.app.zomatoApp.entities.OrderItem;
 import com.codingshuttle.app.zomatoApp.entities.OrderRequest;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
+public interface OrderItemService {
     Optional<OrderItem> findByOrderRequestAndMenuItem(OrderRequest orderRequest, MenuItem menuItem);
+
+    OrderItem save(OrderItem orderItem);
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,10 +20,10 @@ public class OrderRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Double totalAmount;
+    private BigDecimal totalPrice;
+    private int totalItemCount;
 
-    @OneToMany(mappedBy = "orderRequest", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "orderRequest", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     @ManyToOne
@@ -41,8 +42,22 @@ public class OrderRequest {
     private Address deliveryAddress;
 
     @Enumerated(EnumType.STRING)
-    private OrderRequestStatus requestStatus;
+    private OrderRequestStatus orderRequestStatus;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public void updateOrderSummary() {
+        BigDecimal newTotalPrice = BigDecimal.ZERO;
+        int newTotalItemCount = 0;
+
+        for (OrderItem item : orderItems) {
+            newTotalPrice = newTotalPrice.add(item.getMenuItem().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+            newTotalItemCount += item.getQuantity();
+        }
+
+        this.totalPrice = newTotalPrice;
+        this.totalItemCount = newTotalItemCount;
+    }
+
 }

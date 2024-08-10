@@ -14,6 +14,8 @@ import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
 import com.codingshuttle.app.zomatoApp.services.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -68,17 +70,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<RestaurantDto> getAllRestaurants() {
+    public Page<RestaurantDto> getAllRestaurants(PageRequest pageRequest) {
         return null;
     }
 
     @Override
-    public List<DeliveryExecutiveDto> getAllDeliveryExecutive() {
+    public Page<DeliveryExecutiveDto> getAllDeliveryExecutive(PageRequest pageRequest) {
         return null;
     }
 
     @Override
-    public List<OrderDto> getAllOrders() {
+    public Page<OrderDto> getAllOrders(PageRequest pageRequest) {
         return null;
     }
 

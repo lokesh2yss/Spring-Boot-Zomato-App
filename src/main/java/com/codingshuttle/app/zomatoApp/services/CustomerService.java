@@ -1,6 +1,7 @@
 package com.codingshuttle.app.zomatoApp.services;
 
 import com.codingshuttle.app.zomatoApp.dto.*;
+import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import org.locationtech.jts.geom.Point;
@@ -8,13 +9,8 @@ import org.locationtech.jts.geom.Point;
 import java.util.List;
 
 public interface CustomerService {
-    List<RestaurantDto> getNearbyRestaurantsByCustomer(CustomerDto customerDto);
 
-    List<MenuItemDto> getRestaurantMenu(Long restaurantId);
-
-    MenuItemDto addMenuItemToOrderRequest(OrderRequestDto orderRequestDto, MenuItemDto menuItemDto);
-
-    MenuItemDto deleteMenuItemFromOrderRequest(OrderRequestDto orderRequestDto, MenuItemDto menuItemDto);
+    Customer getCustomerById(Long customerId);
 
     OrderDto placeOrder(OrderRequestDto orderRequestDto);
 

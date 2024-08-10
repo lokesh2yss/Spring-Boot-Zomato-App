@@ -31,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createNewOrder(OrderRequest orderRequest) {
-        orderRequest.setRequestStatus(OrderRequestStatus.CONFIRMED);
+        orderRequest.setOrderRequestStatus(OrderRequestStatus.CONFIRMED);
         Order order = modelMapper.map(orderRequest, Order.class);
         order.setId(null);
         order.setOrderStatus(OrderStatus.CONFIRMED);

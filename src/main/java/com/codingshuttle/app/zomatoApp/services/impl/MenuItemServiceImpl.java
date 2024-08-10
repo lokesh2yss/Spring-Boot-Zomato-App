@@ -17,7 +17,7 @@ public class MenuItemServiceImpl implements MenuItemService {
     }
 
     @Override
-    public MenuItem updateMenuItem(Long menuItemID, MenuItem menuItem) {
+    public MenuItem updateMenuItem(Long menuItemId, MenuItem menuItem) {
         return menuItemRepository.save(menuItem);
     }
 
