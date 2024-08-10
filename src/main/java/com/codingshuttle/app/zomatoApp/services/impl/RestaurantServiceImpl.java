@@ -1,21 +1,20 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
-import com.codingshuttle.app.zomatoApp.dto.*;
+import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
+import com.codingshuttle.app.zomatoApp.dto.PointDto;
+import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
 import com.codingshuttle.app.zomatoApp.entities.MenuItem;
 import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.RestaurantRepository;
-import com.codingshuttle.app.zomatoApp.services.AddressService;
-import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
-import com.codingshuttle.app.zomatoApp.services.MenuItemService;
-import com.codingshuttle.app.zomatoApp.services.RestaurantService;
+import com.codingshuttle.app.zomatoApp.services.*;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +26,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final AddressService addressService;
     private final MenuItemService menuItemService;
     private final DeliveryExecutiveService deliveryExecutiveService;
+    private final GeoLocationService geoLocationService;
     @Override
     public MenuItemDto addMenuItem(Long restaurantId, MenuItemDto menuItemDto) {
         Restaurant restaurant = getRestaurantById(restaurantId);
@@ -104,12 +104,18 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public AddressDto addRestaurantAddress(Long restaurantId, AddressDto addressDto) {
+        Restaurant restaurant = getRestaurantById(restaurantId);
+        PointDto restaurantLocation = geoLocationService.getOpenCageGeolocation(addressDto.toString());
+        restaurant.setLocation(modelMapper.map(restaurantLocation, Point.class));
         User user = getUserByRestaurantId(restaurantId);
         return addressService.addAddressForUser(user.getId(), addressDto);
     }
 
     @Override
     public AddressDto updateRestaurantAddress(Long restaurantId, Long addressId, AddressDto addressDto) {
+        Restaurant restaurant = getRestaurantById(restaurantId);
+        PointDto restaurantLocation = geoLocationService.getOpenCageGeolocation(addressDto.toString());
+        restaurant.setLocation(modelMapper.map(restaurantLocation, Point.class));
         User user = getUserByRestaurantId(restaurantId);
         return addressService.updateAddressForUser(user.getId(), addressId, addressDto);
     }

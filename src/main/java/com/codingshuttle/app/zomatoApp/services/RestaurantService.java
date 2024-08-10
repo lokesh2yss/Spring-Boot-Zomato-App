@@ -1,9 +1,11 @@
 package com.codingshuttle.app.zomatoApp.services;
 
-import com.codingshuttle.app.zomatoApp.dto.*;
+import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
+import com.codingshuttle.app.zomatoApp.dto.PointDto;
+import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
 import org.locationtech.jts.geom.Point;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 public interface RestaurantService {

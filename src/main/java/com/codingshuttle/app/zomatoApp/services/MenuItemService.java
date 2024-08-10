@@ -1,7 +1,6 @@
 package com.codingshuttle.app.zomatoApp.services;
 
 import com.codingshuttle.app.zomatoApp.entities.MenuItem;
-import java.util.Optional;
 
 public interface MenuItemService {
     MenuItem addMenuItem(MenuItem menuItem);

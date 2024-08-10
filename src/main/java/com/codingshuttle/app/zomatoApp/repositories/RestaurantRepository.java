@@ -19,4 +19,14 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
             "ORDER BY distance " +
             "LIMIT 20", nativeQuery = true)
     List<Restaurant> findTwentyNearestRestaurants(Point customerLocation);
+
+    @Query(value = "SELECT r.* " +
+            "FROM restaurants r " +
+            "WHERE r.opening_status=OPEN " +
+            "AND r.opening_time < CAST(NOW() AS TIME) " +
+            "AND r.closing_time > CAST(NOW() AS TIME) " +
+            "AND ST_DWithin(r.location, :customerLocation, 15000) " +
+            "ORDER BY r.rating DESC " +
+            "LIMIT 20", nativeQuery = true)
+    List<Restaurant> findTwentyNearbyTopRatedRestaurants(Point customerLocation);
 }
