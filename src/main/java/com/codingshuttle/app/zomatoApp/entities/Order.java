@@ -1,5 +1,6 @@
 package com.codingshuttle.app.zomatoApp.entities;
 
+import com.codingshuttle.app.zomatoApp.entities.enums.OrderDeliveryStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.PaymentMethod;
 import jakarta.persistence.*;
@@ -53,6 +54,9 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    private OrderDeliveryStatus orderDeliveryStatus;
 
     private String pickupOtp;
 

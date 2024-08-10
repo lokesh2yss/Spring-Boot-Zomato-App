@@ -5,8 +5,10 @@ import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
 import com.codingshuttle.app.zomatoApp.entities.Order;
 import com.codingshuttle.app.zomatoApp.entities.User;
+import com.codingshuttle.app.zomatoApp.entities.enums.OrderDeliveryStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
+import com.codingshuttle.app.zomatoApp.exceptions.RuntimeConflictException;
 import com.codingshuttle.app.zomatoApp.repositories.DeliveryExecutiveRepository;
 import com.codingshuttle.app.zomatoApp.services.AddressService;
 import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
@@ -14,6 +16,9 @@ import com.codingshuttle.app.zomatoApp.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +29,60 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
     private final OrderService orderService;
 
     @Override
+    @Transactional
+    public Order acceptOrderDelivery(Order order) {
+        if(order.getOrderDeliveryStatus() != null) {
+            throw new RuntimeException("Invalid order delivery status:"+order.getOrderDeliveryStatus());
+        }
+        if(order.getDeliveryExecutive() != null) {
+            throw new RuntimeException("Order already assigned. Cannot be reassigned");
+        }
+        order.setOrderDeliveryStatus(OrderDeliveryStatus.DELIVERY_ASSIGNED);
+        order.setDeliveryExecutive(getCurrentDeliveryExecutive());
+        return orderService.updateOrder(order);
+    }
+
+    @Override
+    public Order pickupOrderForDelivery(Order order, String pickupOtp) {
+        if(order.getOrderDeliveryStatus() != null) {
+            throw new RuntimeException("Order delivery status is invalid:"+order.getOrderDeliveryStatus());
+        }
+        DeliveryExecutive deliveryExecutive = getCurrentDeliveryExecutive();
+        if(!order.getDeliveryExecutive().equals(deliveryExecutive)) {
+            throw new RuntimeException("Delivery Executive who was assigned to this order can only pickup the order");
+        }
+        if(!pickupOtp.equals(order.getPickupOtp())) {
+            throw new RuntimeConflictException("Incorrect otp provided: "+pickupOtp);
+        }
+
+        order.setOrderDeliveryStatus(OrderDeliveryStatus.PICKED_UP);
+        order.setPickedAt(LocalDateTime.now());
+
+        return orderService.updateOrder(order);
+    }
+
+    @Override
+    public Order completeOrderDelivery(Order order, String deliveryOtp) {
+        if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.PICKED_UP)) {
+            throw new RuntimeException("Order delivery status is invalid:"+order.getOrderDeliveryStatus());
+        }
+        DeliveryExecutive deliveryExecutive = getCurrentDeliveryExecutive();
+        if(!order.getDeliveryExecutive().equals(deliveryExecutive)) {
+            throw new RuntimeException("Delivery Executive who picked up the order can only complete the order");
+        }
+        if(!deliveryOtp.equals(order.getDeliveryOtp())) {
+            throw new RuntimeConflictException("Incorrect otp provided: "+deliveryOtp);
+        }
+        order.setOrderDeliveryStatus(OrderDeliveryStatus.DELIVERED);
+        order.setDeliveredAt(LocalDateTime.now());
+        return orderService.updateOrder(order);
+    }
+
+    @Override
     public PointDto getDeliveryExecutiveLiveLocation(Long orderId) {
         Order order = orderService.getOrderById(orderId);
 
-        if(order.getOrderStatus().equals(OrderStatus.CANCELLED) || order.getOrderStatus().equals(OrderStatus.DELIVERED)) {
+        if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.DELIVERED) && !order.getOrderStatus().equals(OrderStatus.CANCELLED)) {
             throw new RuntimeException("Invalid order status, status:"+order.getOrderStatus());
         }
 
@@ -68,5 +123,10 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
                 .orElseThrow(() -> new ResourceNotFoundException("Delivery Executive not found with id="+deliveryExecutiveId));
 
         return deliveryExecutive.getUser();
+    }
+    private DeliveryExecutive getCurrentDeliveryExecutive() {
+        return deliveryExecutiveRepository.findById(3L)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Delivery executive not found with id:"+3));
     }
 }

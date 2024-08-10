@@ -1,8 +1,7 @@
 package com.codingshuttle.app.zomatoApp.strategies.impl;
 
-import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
-import com.codingshuttle.app.zomatoApp.entities.Restaurant;
+import com.codingshuttle.app.zomatoApp.entities.Order;
 import com.codingshuttle.app.zomatoApp.repositories.DeliveryExecutiveRepository;
 import com.codingshuttle.app.zomatoApp.strategies.DeliveryExecutiveMatchingStrategy;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +15,8 @@ import java.util.List;
 public class NearestTenDeliveryExecutiveMatchingStrategy implements DeliveryExecutiveMatchingStrategy {
     private final DeliveryExecutiveRepository deliveryExecutiveRepository;
     @Override
-    public List<DeliveryExecutive> findMatchingDeliveryExecutives(Customer customer, Restaurant restaurant) {
-        Point restaurantLocation = restaurant.getLocation();
+    public List<DeliveryExecutive> findMatchingDeliveryExecutives(Order order) {
+        Point restaurantLocation = order.getRestaurant().getLocation();
         return deliveryExecutiveRepository.findTenNearestDeliveryExecutives(restaurantLocation);
     }
 }

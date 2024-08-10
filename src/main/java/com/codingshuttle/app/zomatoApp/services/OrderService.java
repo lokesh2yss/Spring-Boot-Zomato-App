@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 public interface OrderService {
     Order getOrderById(Long orderId);
 
-    Order createNewOrder(OrderRequest orderRequest, DeliveryExecutive deliveryExecutive);
+    Order createNewOrder(OrderRequest orderRequest);
 
     Order updateOrderStatus(Order order, OrderStatus orderStatus);
 
@@ -17,4 +17,6 @@ public interface OrderService {
     Page<Order> getAllOrdersOfRestaurant(Restaurant restaurant, PageRequest pageRequest);
 
     Page<Order> getAllOrdersOfDeliveryExecutive(DeliveryExecutive deliveryExecutive, PageRequest pageRequest);
+
+    Order updateOrder(Order order);
 }

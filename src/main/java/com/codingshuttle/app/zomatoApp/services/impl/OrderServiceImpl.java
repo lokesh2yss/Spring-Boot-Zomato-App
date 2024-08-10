@@ -30,12 +30,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createNewOrder(OrderRequest orderRequest, DeliveryExecutive deliveryExecutive) {
+    public Order createNewOrder(OrderRequest orderRequest) {
         orderRequest.setRequestStatus(OrderRequestStatus.CONFIRMED);
         Order order = modelMapper.map(orderRequest, Order.class);
         order.setId(null);
         order.setOrderStatus(OrderStatus.CONFIRMED);
-        order.setDeliveryExecutive(deliveryExecutive);
+        //order.setDeliveryExecutive(deliveryExecutive);
         order.setPickupOtp(generateRandomOtp());
         order.setDeliveryOtp(generateRandomOtp());
         order.setPlacedAt(LocalDateTime.now());
@@ -63,6 +63,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<Order> getAllOrdersOfDeliveryExecutive(DeliveryExecutive deliveryExecutive, PageRequest pageRequest) {
         return orderRepository.findByDeliveryExecutive(deliveryExecutive, pageRequest);
+    }
+
+    @Override
+    public Order updateOrder(Order order) {
+        return orderRepository.save(order);
     }
 
     private String generateRandomOtp() {

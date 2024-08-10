@@ -4,12 +4,14 @@ import com.codingshuttle.app.zomatoApp.dto.AddressDto;
 import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
 import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
+import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.MenuItem;
 import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.RestaurantRepository;
 import com.codingshuttle.app.zomatoApp.services.*;
+import com.codingshuttle.app.zomatoApp.strategies.RestaurantStrategyManager;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
@@ -27,6 +29,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final MenuItemService menuItemService;
     private final DeliveryExecutiveService deliveryExecutiveService;
     private final GeoLocationService geoLocationService;
+    private final RestaurantStrategyManager restaurantStrategyManager;
     @Override
     public MenuItemDto addMenuItem(Long restaurantId, MenuItemDto menuItemDto) {
         Restaurant restaurant = getRestaurantById(restaurantId);
@@ -97,8 +100,10 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public List<RestaurantDto> getNearbyRestaurantsByCustomer(Point customerLocation) {
-        return null;
+    public List<RestaurantDto> getNearbyRestaurantsByCustomer(Customer customer) {
+        return restaurantStrategyManager.restaurantMatchingStrategy(customer.getRating()).findMatchingRestaurants(customer)
+                .stream().map((restaurant) -> modelMapper.map(restaurant, RestaurantDto.class))
+                .collect(Collectors.toList());
     }
 
 

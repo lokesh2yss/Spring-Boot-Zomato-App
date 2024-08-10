@@ -4,7 +4,7 @@ import com.codingshuttle.app.zomatoApp.dto.AddressDto;
 import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
 import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
-import org.locationtech.jts.geom.Point;
+import com.codingshuttle.app.zomatoApp.entities.Customer;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public interface RestaurantService {
 
     PointDto getDeliveryExecutiveLiveLocation(Long orderId);
 
-    List<RestaurantDto> getNearbyRestaurantsByCustomer(Point customerLocation);
+    List<RestaurantDto> getNearbyRestaurantsByCustomer(Customer customer);
 
 
     AddressDto addRestaurantAddress(Long restaurantId, AddressDto addressDto);
