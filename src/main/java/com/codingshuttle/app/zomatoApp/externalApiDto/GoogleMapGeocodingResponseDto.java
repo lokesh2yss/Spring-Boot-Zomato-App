@@ -1,10 +1,10 @@
-package com.codingshuttle.app.zomatoApp.json;
+package com.codingshuttle.app.zomatoApp.externalApiDto;
 
 import lombok.Data;
 import java.util.List;
 
 @Data
-public class GoogleMapGeocodingResponse {
+public class GoogleMapGeocodingResponseDto {
     private List<Result> results;
     @Data
     public static class Result {

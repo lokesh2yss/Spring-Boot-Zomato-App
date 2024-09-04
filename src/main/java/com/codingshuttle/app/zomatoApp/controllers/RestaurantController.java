@@ -19,7 +19,7 @@ public class RestaurantController {
     public MenuItemDto addMenuItem(
             @PathVariable("restaurantId") Long restaurantId,
             @RequestBody MenuItemDto menuItemDto) {
-        return restaurantService.addMenuItem(restaurantId, menuItemDto);
+        return restaurantService.addMenuItem(menuItemDto);
     }
 
     @PutMapping("/{restaurantId}/menu-items/{menuItemId}")
@@ -27,21 +27,21 @@ public class RestaurantController {
             @PathVariable("restaurantId") Long restaurantId,
             @PathVariable("menuItemId") Long menuItemId,
             @RequestBody MenuItemDto menuItemDto) {
-        return restaurantService.updateMenuItem(restaurantId, menuItemId, menuItemDto);
+        return restaurantService.updateMenuItem(menuItemId, menuItemDto);
     }
 
     @DeleteMapping("/{restaurantId}/menu-items/{menuItemId}")
     public boolean deleteMenuItem(
             @PathVariable("restaurantId") Long restaurantId,
             @PathVariable("menuItemId") Long menuItemId) {
-        return restaurantService.deleteMenuItem(restaurantId, menuItemId);
+        return restaurantService.deleteMenuItem(menuItemId);
     }
 
     @GetMapping("/{restaurantId}/menu-items/{menuItemId}")
     public MenuItemDto getMenuItemById(
             @PathVariable("restaurantId") Long restaurantId,
             @PathVariable("menuItemId") Long menuItemId) {
-        return restaurantService.getMenuItemById(restaurantId, menuItemId);
+        return restaurantService.getMenuItemById(menuItemId);
     }
 
     @GetMapping("/{restaurantId}/menu-items")
@@ -54,20 +54,20 @@ public class RestaurantController {
     public AddressDto addAddress(
             @PathVariable("restaurantId") Long restaurantId,
             @RequestBody AddressDto addressDto) {
-        return restaurantService.addRestaurantAddress(restaurantId, addressDto);
+        return restaurantService.addRestaurantAddress(addressDto);
     }
 
     @GetMapping("/{restaurantId}/default-address")
     public AddressDto getRestaurantDefaultAddress(
             @PathVariable("restaurantId") Long restaurantId) {
-        return restaurantService.getRestaurantDefaultAddress(restaurantId);
+        return restaurantService.getRestaurantDefaultAddress();
     }
 
     @PostMapping("/{restaurantId}/default-address/{addressId}")
     public AddressDto setDefaultAddress(
             @PathVariable("restaurantId") Long restaurantId,
             @PathVariable("addressId") Long addressId) {
-        return restaurantService.setRestaurantDefaultAddress(restaurantId, addressId);
+        return restaurantService.setRestaurantDefaultAddress(addressId);
     }
 
     @PutMapping("/{restaurantId}/addresses/{addressId}")
@@ -75,13 +75,13 @@ public class RestaurantController {
             @PathVariable("restaurantId") Long restaurantId,
             @PathVariable("addressId") Long addressId,
             @RequestBody AddressDto addressDto) {
-        return restaurantService.updateRestaurantAddress(restaurantId, addressId, addressDto);
+        return restaurantService.updateRestaurantAddress(addressId, addressDto);
     }
 
     @DeleteMapping("/{restaurantId}/addresses/{addressId}")
     public boolean deleteAddress(
             @PathVariable("restaurantId") Long restaurantId,
             @PathVariable("addressId") Long addressId) {
-        return restaurantService.deleteRestaurantAddress(restaurantId, addressId);
+        return restaurantService.deleteRestaurantAddress(addressId);
     }
 }

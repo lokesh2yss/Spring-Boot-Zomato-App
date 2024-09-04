@@ -16,9 +16,7 @@ public class MenuItemDto {
     private Double price;
 
     private String title;
-
-    private RestaurantDto restaurant;
-
+    
     private String description;
 
     private Double rating;

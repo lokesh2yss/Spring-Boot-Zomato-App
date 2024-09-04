@@ -11,13 +11,13 @@ import java.util.List;
 
 public interface RestaurantService {
 
-    MenuItemDto addMenuItem(Long restaurantId, MenuItemDto menuItemDto);
+    MenuItemDto addMenuItem(MenuItemDto menuItemDto);
 
-    boolean deleteMenuItem(Long restaurantId, Long menuItemId);
+    boolean deleteMenuItem(Long menuItemId);
 
-    MenuItemDto updateMenuItem(Long restaurantId, Long menuItemId, MenuItemDto menuItemDto);
+    MenuItemDto updateMenuItem(Long menuItemId, MenuItemDto menuItemDto);
 
-    MenuItemDto getMenuItemById(Long restaurantId, Long menuItemId);
+    MenuItemDto getMenuItemById(Long menuItemId);
 
     List<MenuItemDto> getRestaurantMenu(Long restaurantId);
 
@@ -31,15 +31,17 @@ public interface RestaurantService {
 
     List<RestaurantDto> getNearbyRestaurantsByCustomer(Customer customer);
 
-    AddressDto addRestaurantAddress(Long restaurantId, AddressDto addressDto);
+    AddressDto addRestaurantAddress(AddressDto addressDto);
 
-    AddressDto updateRestaurantAddress(Long restaurantId, Long addressId, AddressDto addressDto);
+    AddressDto updateRestaurantAddress(Long addressId, AddressDto addressDto);
 
-    boolean deleteRestaurantAddress(Long restaurantId, Long addressId);
+    boolean deleteRestaurantAddress(Long addressId);
 
-    AddressDto getRestaurantDefaultAddress(Long  restaurantId);
+    AddressDto getRestaurantDefaultAddress();
 
-    AddressDto setRestaurantDefaultAddress(Long  restaurantId, Long addressId);
+    AddressDto setRestaurantDefaultAddress(Long addressId);
 
     Restaurant getRestaurantById(Long restaurantId);
+
+    Restaurant createNewRestaurant(Restaurant restaurant);
 }

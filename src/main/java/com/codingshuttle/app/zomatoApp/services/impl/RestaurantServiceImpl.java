@@ -31,8 +31,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final GeoLocationService geoLocationService;
     private final RestaurantStrategyManager restaurantStrategyManager;
     @Override
-    public MenuItemDto addMenuItem(Long restaurantId, MenuItemDto menuItemDto) {
-        Restaurant restaurant = getRestaurantById(restaurantId);
+    public MenuItemDto addMenuItem(MenuItemDto menuItemDto) {
+        Restaurant restaurant = getCurrentRestaurant();
         MenuItem menuItem = modelMapper.map(menuItemDto, MenuItem.class);
         menuItem.setRestaurant(restaurant);
         MenuItem savedMenuItem = menuItemService.addMenuItem(menuItem);
@@ -41,32 +41,32 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public boolean deleteMenuItem(Long restaurantId, Long menuItemId) {
-        Restaurant restaurant = getRestaurantById(restaurantId);
+    public boolean deleteMenuItem(Long menuItemId) {
+        Restaurant restaurant = getCurrentRestaurant();
         MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
         if(!menuItem.getRestaurant().equals(restaurant)) {
-            throw new RuntimeException("Cannot delete menu item as it doesn't belong to restaurant with id:"+restaurantId);
+            throw new RuntimeException("Cannot delete menu item as it doesn't belong to restaurant with id:"+restaurant.getId());
         }
         return menuItemService.deleteMenuItem(menuItemId);
     }
 
     @Override
-    public MenuItemDto updateMenuItem(Long restaurantId, Long menuItemId,  MenuItemDto menuItemDto) {
-        Restaurant restaurant = getRestaurantById(restaurantId);
+    public MenuItemDto updateMenuItem(Long menuItemId,  MenuItemDto menuItemDto) {
+        Restaurant restaurant = getCurrentRestaurant();
         MenuItem menuItem = modelMapper.map(menuItemDto, MenuItem.class);
         if(!menuItem.getRestaurant().equals(restaurant)) {
-            throw new RuntimeException("Cannot update menu item as it doesn't belong to restaurant with id:"+restaurantId);
+            throw new RuntimeException("Cannot update menu item as it doesn't belong to restaurant with id:"+restaurant.getId());
         }
         MenuItem savedMenuItem = menuItemService.updateMenuItem(menuItemId, menuItem);
         return modelMapper.map(savedMenuItem, MenuItemDto.class);
     }
 
     @Override
-    public MenuItemDto getMenuItemById(Long restaurantId, Long menuItemId) {
-        Restaurant restaurant = getRestaurantById(restaurantId);
+    public MenuItemDto getMenuItemById(Long menuItemId) {
+        Restaurant restaurant = getCurrentRestaurant();
         MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
         if(!menuItem.getRestaurant().equals(restaurant)) {
-            throw new RuntimeException("Cannot get the menu item as it doesn't belong to restaurant with id:"+restaurantId);
+            throw new RuntimeException("Cannot get the menu item as it doesn't belong to restaurant with id:"+restaurant.getId());
         }
         return modelMapper.map(menuItem, MenuItemDto.class);
     }
@@ -108,38 +108,41 @@ public class RestaurantServiceImpl implements RestaurantService {
 
 
     @Override
-    public AddressDto addRestaurantAddress(Long restaurantId, AddressDto addressDto) {
-        Restaurant restaurant = getRestaurantById(restaurantId);
+    public AddressDto addRestaurantAddress(AddressDto addressDto) {
+        Restaurant restaurant = getCurrentRestaurant();
         PointDto restaurantLocation = geoLocationService.getOpenCageGeolocation(addressDto.toString());
         restaurant.setLocation(modelMapper.map(restaurantLocation, Point.class));
-        User user = getUserByRestaurantId(restaurantId);
+        User user = restaurant.getUser();
         return addressService.addAddressForUser(user.getId(), addressDto);
     }
 
     @Override
-    public AddressDto updateRestaurantAddress(Long restaurantId, Long addressId, AddressDto addressDto) {
-        Restaurant restaurant = getRestaurantById(restaurantId);
+    public AddressDto updateRestaurantAddress(Long addressId, AddressDto addressDto) {
+        Restaurant restaurant = getCurrentRestaurant();
         PointDto restaurantLocation = geoLocationService.getOpenCageGeolocation(addressDto.toString());
         restaurant.setLocation(modelMapper.map(restaurantLocation, Point.class));
-        User user = getUserByRestaurantId(restaurantId);
+        User user = restaurant.getUser();
         return addressService.updateAddressForUser(user.getId(), addressId, addressDto);
     }
 
     @Override
-    public boolean deleteRestaurantAddress(Long restaurantId, Long addressId) {
-        User user = getUserByRestaurantId(restaurantId);
+    public boolean deleteRestaurantAddress(Long addressId) {
+        Restaurant restaurant = getCurrentRestaurant();
+        User user = restaurant.getUser();
         return addressService.deleteAddressForUser(user.getId(), addressId);
     }
 
     @Override
-    public AddressDto getRestaurantDefaultAddress(Long restaurantId) {
-        User user = getUserByRestaurantId(restaurantId);
+    public AddressDto getRestaurantDefaultAddress() {
+        Restaurant restaurant = getCurrentRestaurant();
+        User user = restaurant.getUser();
         return modelMapper.map(user.getDefaultAddress(), AddressDto.class);
     }
 
     @Override
-    public AddressDto setRestaurantDefaultAddress(Long restaurantId, Long addressId) {
-        User user = getUserByRestaurantId(restaurantId);
+    public AddressDto setRestaurantDefaultAddress(Long addressId) {
+        Restaurant restaurant = getCurrentRestaurant();
+        User user = restaurant.getUser();
         return addressService.setDefaultAddressForUser(user.getId(), addressId);
     }
     private User getUserByRestaurantId(Long restaurantId) {
@@ -154,5 +157,17 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.findById(restaurantId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Restaurant not found with id:"+restaurantId));
+    }
+
+    @Override
+    public Restaurant createNewRestaurant(Restaurant restaurant) {
+        return restaurantRepository.save(restaurant);
+    }
+
+    private Restaurant getCurrentRestaurant() {
+//        TODO add spring security
+        return restaurantRepository.findById(2L)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Restaurant not found with id:"+2));
     }
 }

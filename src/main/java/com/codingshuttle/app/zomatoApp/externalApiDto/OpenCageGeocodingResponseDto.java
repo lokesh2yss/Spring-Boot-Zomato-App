@@ -1,4 +1,4 @@
-package com.codingshuttle.app.zomatoApp.json;
+package com.codingshuttle.app.zomatoApp.externalApiDto;
 
 import lombok.Data;
 

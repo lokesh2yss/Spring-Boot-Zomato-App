@@ -1,9 +1,9 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.dto.PointDto;
-import com.codingshuttle.app.zomatoApp.json.GoogleMapGeocodingResponse;
-import com.codingshuttle.app.zomatoApp.json.IpApiGeocodingResponseDto;
-import com.codingshuttle.app.zomatoApp.json.OpenCageGeocodingResponseDto;
+import com.codingshuttle.app.zomatoApp.externalApiDto.GoogleMapGeocodingResponseDto;
+import com.codingshuttle.app.zomatoApp.externalApiDto.IpApiGeocodingResponseDto;
+import com.codingshuttle.app.zomatoApp.externalApiDto.OpenCageGeocodingResponseDto;
 import com.codingshuttle.app.zomatoApp.services.GeoLocationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -113,9 +113,9 @@ public class GeoLocationServiceImpl implements GeoLocationService {
             log.error(e.getMessage(), (Object) e.getStackTrace());
             throw new RuntimeException(e);
         }
-        GoogleMapGeocodingResponse googleMapGeocodingResponse;
+        GoogleMapGeocodingResponseDto googleMapGeocodingResponseDto;
         try {
-            googleMapGeocodingResponse = objectMapper.readValue(jsonResponse, GoogleMapGeocodingResponse.class);
+            googleMapGeocodingResponseDto = objectMapper.readValue(jsonResponse, GoogleMapGeocodingResponseDto.class);
         }catch (Exception e) {
             log.error(e.getMessage(), (Object) e.getStackTrace());
             throw new RuntimeException(e);
@@ -123,8 +123,8 @@ public class GeoLocationServiceImpl implements GeoLocationService {
         double latitude;
         double longitude;
         try {
-            latitude = googleMapGeocodingResponse.getResults().getFirst().getGeometry().getLocation().getLat();
-            longitude = googleMapGeocodingResponse.getResults().getFirst().getGeometry().getLocation().getLng();
+            latitude = googleMapGeocodingResponseDto.getResults().getFirst().getGeometry().getLocation().getLat();
+            longitude = googleMapGeocodingResponseDto.getResults().getFirst().getGeometry().getLocation().getLng();
         }catch (Exception e) {
             log.error(e.getMessage(), (Object) e.getStackTrace());
             throw new RuntimeException(e);

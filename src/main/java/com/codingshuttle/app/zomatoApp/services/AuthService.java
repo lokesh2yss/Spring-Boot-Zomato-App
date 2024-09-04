@@ -5,11 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 public interface AuthService {
-    String login(String email, String password);
+    String[] login(String email, String password);
 
     UserDto signup(SignupDto signupDto);
 
-    RestaurantDto onboardRestaurant(Long userId);
+    String refreshToken(String refreshToken);
+
+    RestaurantDto onboardNewRestaurant(Long userId, OnboardRestaurantDto onboardRestaurantDto);
 
     DeliveryExecutiveDto onboardDeliveryExecutive(Long userId);
 

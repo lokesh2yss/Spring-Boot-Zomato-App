@@ -8,14 +8,17 @@ import com.codingshuttle.app.zomatoApp.entities.enums.Role;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.exceptions.RuntimeConflictException;
 import com.codingshuttle.app.zomatoApp.repositories.UserRepository;
-import com.codingshuttle.app.zomatoApp.services.AuthService;
-import com.codingshuttle.app.zomatoApp.services.CustomerService;
-import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
-import com.codingshuttle.app.zomatoApp.services.RestaurantService;
+import com.codingshuttle.app.zomatoApp.security.JwtService;
+import com.codingshuttle.app.zomatoApp.services.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,9 +32,20 @@ public class AuthServiceImpl implements AuthService {
     private final CustomerService customerService;
     private final RestaurantService restaurantService;
     private final DeliveryExecutiveService deliveryExecutiveService;
+    private final WalletService walletService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
     @Override
-    public String login(String email, String password) {
-        return null;
+    public String[] login(String email, String password) {
+        Authentication authentication  = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        User user = (User) authentication.getPrincipal();
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new String[] {accessToken, refreshToken};
     }
 
     @Override
@@ -41,20 +55,39 @@ public class AuthServiceImpl implements AuthService {
         User mappedUser = modelMapper.map(signupDto, User.class);
         mappedUser.setRoles(Set.of(Role.CUSTOMER));
 
+        mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
         User savedUser = userRepository.save(mappedUser);
         customerService.createNewCustomer(savedUser);
+
+        walletService.createNewWallet(savedUser);
+
         return modelMapper.map(savedUser, UserDto.class);
     }
 
     @Override
-    public RestaurantDto onboardRestaurant(Long userId) {
-        User user = getUserById(userId);
-        user.setRoles(Set.of(Role.RESTAURANT));
-        User savedUser = userRepository.save(user);
-        Restaurant restaurant = new Restaurant();
-        restaurant.setUser(savedUser);
+    public String refreshToken(String refreshToken) {
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: "+userId));
 
-        return modelMapper.map(restaurant, RestaurantDto.class);
+        return jwtService.generateAccessToken(user);
+    }
+
+    @Override
+    public RestaurantDto onboardNewRestaurant(Long userId, OnboardRestaurantDto onboardRestaurantDto) {
+        User user = getUserById(userId);
+        if(user.getRoles().contains(Role.RESTAURANT)) {
+            throw new RuntimeConflictException("User with id: "+user.getId()+"already onboarded as a restaurant");
+        }
+        user.getRoles().add(Role.RESTAURANT);
+        User savedUser = userRepository.save(user);
+        Restaurant restaurant = modelMapper.map(onboardRestaurantDto, Restaurant.class);
+        restaurant.setUser(savedUser);
+        restaurant.setRating(0.0);
+        Restaurant savedRestaurant = restaurantService.createNewRestaurant(restaurant);
+
+        return modelMapper.map(savedRestaurant, RestaurantDto.class);
     }
 
     @Override

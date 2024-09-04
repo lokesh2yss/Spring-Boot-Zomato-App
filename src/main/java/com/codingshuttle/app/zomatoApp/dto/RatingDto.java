@@ -10,10 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RatingDto {
     private Long id;
-
     private OrderDto order;
-
     private UserDto user;
-
     private RatingType ratingType;
 }
