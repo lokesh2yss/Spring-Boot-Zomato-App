@@ -16,7 +16,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
             "AND r.opening_time < CAST(NOW() AS TIME) " +
             "AND r.closing_time > CAST(NOW() AS TIME) " +
             "AND ST_DWithin(r.location, :customerLocation, 10000) " +
-            "ORDER BY distance " +
+            "ORDER BY distance ASC " +
             "LIMIT 20", nativeQuery = true)
     List<Restaurant> findTwentyNearestRestaurants(Point customerLocation);
 

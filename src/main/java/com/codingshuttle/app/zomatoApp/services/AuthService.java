@@ -17,8 +17,6 @@ public interface AuthService {
 
     Page<DeliveryExecutiveDto> getAllDeliveryExecutive(PageRequest pageRequest);
 
-    Page<OrderDto> getAllOrders(PageRequest pageRequest);
-
     boolean banDeliveryExecutive(Long deliveryExecutiveId);
 
     boolean banRestaurant(Long restaurantId);

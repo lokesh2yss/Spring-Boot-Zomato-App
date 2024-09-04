@@ -1,8 +1,7 @@
 package com.codingshuttle.app.zomatoApp.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,6 +10,9 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name="wallets")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

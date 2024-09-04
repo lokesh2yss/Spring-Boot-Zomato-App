@@ -79,11 +79,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Page<OrderDto> getAllOrders(PageRequest pageRequest) {
-        return null;
-    }
-
-    @Override
     public boolean banDeliveryExecutive(Long deliveryExecutiveId) {
         return false;
     }

@@ -14,7 +14,7 @@ public interface DeliveryExecutiveRepository extends JpaRepository<DeliveryExecu
             "FROM delivery_executives d " +
             "WHERE d.available_status=AVAILABLE " +
             "AND ST_DWithin(d.current_location, :restaurantLocation, 10000) " +
-            "ORDER BY distance " +
+            "ORDER BY distance ASC " +
             "LIMIT 10", nativeQuery = true)
     List<DeliveryExecutive> findTenNearestDeliveryExecutives(Point restaurantLocation);
 
