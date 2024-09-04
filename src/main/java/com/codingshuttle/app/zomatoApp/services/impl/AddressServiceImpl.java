@@ -84,7 +84,8 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id="+userId));
 
     }
-    private Address getAddressById(Long addressId) {
+    @Override
+    public Address getAddressById(Long addressId) {
         return addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found with id="+addressId));
 

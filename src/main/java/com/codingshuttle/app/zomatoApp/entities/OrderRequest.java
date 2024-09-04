@@ -35,13 +35,6 @@ public class OrderRequest {
     private Restaurant restaurant;
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
-    private Address deliveryAddress;
-
-    @Enumerated(EnumType.STRING)
     private OrderRequestStatus orderRequestStatus;
 
     @CreationTimestamp

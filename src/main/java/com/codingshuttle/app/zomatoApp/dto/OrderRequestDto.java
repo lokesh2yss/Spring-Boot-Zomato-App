@@ -23,10 +23,6 @@ public class OrderRequestDto {
 
     private RestaurantDto restaurant;
 
-    private PaymentMethod paymentMethod;
-
-    private AddressDto deliveryAddress;
-
     private OrderRequestStatus requestStatus;
 
     private LocalDateTime createdAt;

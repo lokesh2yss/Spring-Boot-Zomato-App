@@ -1,6 +1,5 @@
 package com.codingshuttle.app.zomatoApp.services;
 
-import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
 import com.codingshuttle.app.zomatoApp.dto.OrderRequestDto;
 import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.OrderRequest;

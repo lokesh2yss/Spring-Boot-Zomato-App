@@ -1,10 +1,13 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
+import com.codingshuttle.app.zomatoApp.dto.AddressDto;
 import com.codingshuttle.app.zomatoApp.entities.*;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderRequestStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
+import com.codingshuttle.app.zomatoApp.entities.enums.PaymentMethod;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.OrderRepository;
+import com.codingshuttle.app.zomatoApp.services.AddressService;
 import com.codingshuttle.app.zomatoApp.services.OrderRequestService;
 import com.codingshuttle.app.zomatoApp.services.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ModelMapper modelMapper;
     private final OrderRequestService orderRequestService;
+    private final AddressService addressService;
     @Override
     public Order getOrderById(Long orderId) {
         return orderRepository.findById(orderId)
@@ -30,11 +34,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createNewOrder(OrderRequest orderRequest) {
+    public Order createNewOrder(OrderRequest orderRequest, PaymentMethod paymentMethod, Long addressId) {
+        Address deliveryAddress = addressService.getAddressById(addressId);
         orderRequest.setOrderRequestStatus(OrderRequestStatus.CONFIRMED);
         Order order = modelMapper.map(orderRequest, Order.class);
         order.setId(null);
         order.setOrderStatus(OrderStatus.CONFIRMED);
+        order.setPaymentMethod(paymentMethod);
+        order.setDeliveryAddress(deliveryAddress);
+
         //order.setDeliveryExecutive(deliveryExecutive);
         order.setPickupOtp(generateRandomOtp());
         order.setDeliveryOtp(generateRandomOtp());

@@ -23,4 +23,9 @@ public class OrderItemServiceImpl implements OrderItemService {
     public OrderItem save(OrderItem orderItem) {
         return orderItemRepository.save(orderItem);
     }
+
+    @Override
+    public void delete(Long orderItemId) {
+        orderItemRepository.deleteById(orderItemId);
+    }
 }

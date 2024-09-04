@@ -1,12 +1,14 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
-import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
 import com.codingshuttle.app.zomatoApp.dto.OrderRequestDto;
 import com.codingshuttle.app.zomatoApp.entities.*;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderRequestStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
+import com.codingshuttle.app.zomatoApp.exceptions.RuntimeConflictException;
 import com.codingshuttle.app.zomatoApp.repositories.OrderRequestRepository;
-import com.codingshuttle.app.zomatoApp.services.*;
+import com.codingshuttle.app.zomatoApp.services.MenuItemService;
+import com.codingshuttle.app.zomatoApp.services.OrderItemService;
+import com.codingshuttle.app.zomatoApp.services.OrderRequestService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,10 @@ public class OrderRequestServiceImpl implements OrderRequestService {
                 .orElseGet(() -> createNewOrderRequest(restaurant, customer));
 
         MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
+
+        if(!menuItem.getRestaurant().equals(restaurant)) {
+            throw new RuntimeConflictException("Menu item doesn't belong to the restaurant with id:"+restaurant.getId());
+        }
         OrderItem orderItem = orderItemService.findByOrderRequestAndMenuItem(orderRequest, menuItem)
                 .orElseGet(() -> createNewOrderItem(orderRequest, menuItem));
         orderItem.setQuantity(orderItem.getQuantity() + quantity);
@@ -73,6 +79,23 @@ public class OrderRequestServiceImpl implements OrderRequestService {
 
     @Override
     public OrderRequestDto deleteMenuItemFromOrderRequest(Restaurant restaurant, Customer customer, Long menuItemId) {
-        return null;
+        OrderRequest orderRequest = orderRequestRepository.findByCustomerAndOrderRequestStatus(customer, OrderRequestStatus.PENDING)
+                .orElseThrow(() -> new ResourceNotFoundException("OrderRequest not found for customer with id:"+customer.getId()));
+
+        MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
+        OrderItem orderItem = orderItemService.findByOrderRequestAndMenuItem(orderRequest, menuItem)
+                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found with id:"+menuItemId));
+
+        if(orderItem.getQuantity() > 1) {
+            orderItem.setQuantity(orderItem.getQuantity() - 1);
+            OrderItem savedOrderItem = orderItemService.save(orderItem);
+        }else {
+            orderItemService.delete(orderItem.getId());
+        }
+
+        // Recalculate order totals, etc.
+        orderRequest.updateOrderSummary();
+        OrderRequest savedOrderRequest = orderRequestRepository.save(orderRequest);  // Save the OrderRequest to persist the updated order
+        return modelMapper.map(savedOrderRequest, OrderRequestDto.class);
     }
 }

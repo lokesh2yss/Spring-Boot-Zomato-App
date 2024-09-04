@@ -4,8 +4,6 @@ import com.codingshuttle.app.zomatoApp.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
-
 public interface AuthService {
     String login(String email, String password);
 

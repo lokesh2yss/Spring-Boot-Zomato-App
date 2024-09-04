@@ -10,4 +10,6 @@ public interface OrderItemService {
     Optional<OrderItem> findByOrderRequestAndMenuItem(OrderRequest orderRequest, MenuItem menuItem);
 
     OrderItem save(OrderItem orderItem);
+
+    void delete(Long orderItemId);
 }
