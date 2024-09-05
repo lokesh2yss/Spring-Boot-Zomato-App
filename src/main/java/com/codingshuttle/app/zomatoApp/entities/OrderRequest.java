@@ -1,15 +1,16 @@
 package com.codingshuttle.app.zomatoApp.entities;
 
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderRequestStatus;
-import com.codingshuttle.app.zomatoApp.entities.enums.PaymentMethod;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter

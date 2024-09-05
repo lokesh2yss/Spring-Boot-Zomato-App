@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,7 +65,6 @@ public class OrderRequestServiceImpl implements OrderRequestService {
             // Recalculate order totals, etc.
             orderRequest.updateOrderSummary();
             OrderRequest savedOrderRequest = orderRequestRepository.save(orderRequest);  // Save the OrderRequest to persist the updated order
-
 
             return modelMapper.map(savedOrderRequest, OrderRequestDto.class);
         }catch (Exception e) {

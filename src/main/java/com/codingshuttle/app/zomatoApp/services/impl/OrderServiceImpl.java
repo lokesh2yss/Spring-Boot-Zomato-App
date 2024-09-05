@@ -1,6 +1,5 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
 import com.codingshuttle.app.zomatoApp.entities.*;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderRequestStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;

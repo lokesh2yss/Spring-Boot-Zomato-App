@@ -1,6 +1,7 @@
 package com.codingshuttle.app.zomatoApp.externalApiDto;
 
 import lombok.Data;
+
 import java.util.List;
 
 @Data

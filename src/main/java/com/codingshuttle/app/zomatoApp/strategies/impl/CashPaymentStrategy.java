@@ -2,7 +2,6 @@ package com.codingshuttle.app.zomatoApp.strategies.impl;
 
 import com.codingshuttle.app.zomatoApp.entities.Order;
 import com.codingshuttle.app.zomatoApp.entities.Payment;
-import com.codingshuttle.app.zomatoApp.entities.Wallet;
 import com.codingshuttle.app.zomatoApp.entities.enums.PaymentStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.TransactionMethod;
 import com.codingshuttle.app.zomatoApp.services.PaymentService;

@@ -2,7 +2,6 @@ package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.entities.Customer;
-import com.codingshuttle.app.zomatoApp.entities.OrderRequest;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
