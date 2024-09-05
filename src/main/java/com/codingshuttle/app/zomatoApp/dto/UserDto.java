@@ -3,6 +3,7 @@ package com.codingshuttle.app.zomatoApp.dto;
 import com.codingshuttle.app.zomatoApp.entities.enums.AccountStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.Role;
 import com.codingshuttle.app.zomatoApp.entities.enums.VerificationStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,7 @@ public class UserDto {
 
     private LocalDate dob;
 
+    @JsonIgnore
     private List<AddressDto> addresses;
 
     private AddressDto defaultAddress;

@@ -10,7 +10,7 @@ public interface OrderRequestService {
 
     void update(OrderRequest orderRequest);
 
-    OrderRequestDto addMenuItemToOrderRequest(Restaurant restaurant, Customer customer, Long menuItemId, int quantity);
+    OrderRequestDto addMenuItemToOrderRequest(Customer customer, Long menuItemId, int quantity);
 
-    OrderRequestDto deleteMenuItemFromOrderRequest(Restaurant restaurant, Customer customer, Long menuItemId);
+    OrderRequestDto deleteMenuItemFromOrderRequest(Customer customer, Long menuItemId);
 }

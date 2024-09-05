@@ -1,29 +1,33 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderRequestDto;
-import com.codingshuttle.app.zomatoApp.dto.ReviewDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.entities.Customer;
+import com.codingshuttle.app.zomatoApp.entities.OrderRequest;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.CustomerRepository;
 import com.codingshuttle.app.zomatoApp.services.AddressService;
 import com.codingshuttle.app.zomatoApp.services.CustomerService;
+import com.codingshuttle.app.zomatoApp.services.OrderRequestService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.lang.module.ResolutionException;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
     private final AddressService addressService;
+    private final OrderRequestService orderRequestService;
 
     @Override
     public Customer getCustomerById(Long customerId) {
@@ -135,6 +139,27 @@ public class CustomerServiceImpl implements CustomerService {
                         .rating(0.0)
                         .build();
         customerRepository.save(toSaveCustomer);
+
+    }
+
+    @Override
+    public OrderRequestDto addOrderItemToOrderRequest(Long customerId, OrderRequestItemDto orderRequestItemDto) {
+        Customer customer = getCurrentCustomer();
+        log.info("Retrieved currentCustomer in addOrderItemToOrderRequest {}", customer);
+        return orderRequestService.addMenuItemToOrderRequest(customer, orderRequestItemDto.getMenuItemId(), orderRequestItemDto.getQuantity());
+    }
+
+    @Override
+    public OrderRequestDto deleteOrderItemFromOrderRequest(Long customerId, Long menuItemId) {
+        Customer customer = getCurrentCustomer();
+        log.info("Retrieved currentCustomer in addOrderItemToOrderRequest {}", customer);
+        return orderRequestService.deleteMenuItemFromOrderRequest(customer, menuItemId);
+    }
+
+    private Customer getCurrentCustomer() {
+        User user =  (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return customerRepository.findByUser(user).orElseThrow(() ->
+                new ResolutionException("Customer not associated with user with id "+user.getId()));
 
     }
 }

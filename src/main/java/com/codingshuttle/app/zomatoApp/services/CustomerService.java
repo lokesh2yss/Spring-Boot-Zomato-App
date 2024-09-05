@@ -1,9 +1,6 @@
 package com.codingshuttle.app.zomatoApp.services;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderRequestDto;
-import com.codingshuttle.app.zomatoApp.dto.ReviewDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
@@ -52,4 +49,8 @@ public interface CustomerService {
 
 
     void createNewCustomer(User user);
+
+    OrderRequestDto addOrderItemToOrderRequest(Long customerId, OrderRequestItemDto orderRequestItemDto);
+
+    OrderRequestDto deleteOrderItemFromOrderRequest(Long customerId, Long menuItemId);
 }

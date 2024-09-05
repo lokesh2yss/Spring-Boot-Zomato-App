@@ -1,6 +1,7 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.entities.MenuItem;
+import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.MenuItemRepository;
 import com.codingshuttle.app.zomatoApp.services.MenuItemService;

@@ -1,6 +1,7 @@
 package com.codingshuttle.app.zomatoApp.entities;
 
 import com.codingshuttle.app.zomatoApp.entities.enums.MenuItemStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,8 +24,9 @@ public class MenuItem {
 
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurant_id")
+    @JsonIgnore
     private Restaurant restaurant;
 
     @Column(columnDefinition = "TEXT")

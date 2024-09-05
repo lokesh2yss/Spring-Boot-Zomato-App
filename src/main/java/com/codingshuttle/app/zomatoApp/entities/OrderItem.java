@@ -1,5 +1,6 @@
 package com.codingshuttle.app.zomatoApp.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,16 +20,17 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_request_id")
+    @JsonIgnore
     private OrderRequest orderRequest;
 
     @ManyToOne
     @JoinColumn(name = "menu_item_id")
     private MenuItem menuItem;
 
-    @Column(nullable = false)
     private Integer quantity;
 }

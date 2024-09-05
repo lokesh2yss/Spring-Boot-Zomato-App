@@ -3,6 +3,7 @@ package com.codingshuttle.app.zomatoApp.entities;
 import com.codingshuttle.app.zomatoApp.entities.enums.RestaurantCategory;
 import com.codingshuttle.app.zomatoApp.entities.enums.RestaurantCuisine;
 import com.codingshuttle.app.zomatoApp.entities.enums.RestaurantOpenStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class Restaurant {
     private User user;
 
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonIgnore
     private List<MenuItem> menuItems;
 
     @Column(columnDefinition = "TEXT")

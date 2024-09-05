@@ -10,13 +10,21 @@ import com.codingshuttle.app.zomatoApp.services.MenuItemService;
 import com.codingshuttle.app.zomatoApp.services.OrderItemService;
 import com.codingshuttle.app.zomatoApp.services.OrderRequestService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderRequestServiceImpl implements OrderRequestService {
     private final OrderRequestRepository orderRequestRepository;
     private final MenuItemService menuItemService;
@@ -39,32 +47,41 @@ public class OrderRequestServiceImpl implements OrderRequestService {
     }
 
     @Override
-    public OrderRequestDto addMenuItemToOrderRequest(Restaurant restaurant, Customer customer, Long menuItemId, int quantity) {
-        OrderRequest orderRequest = orderRequestRepository.findByCustomerAndOrderRequestStatus(customer, OrderRequestStatus.PENDING)
-                .orElseGet(() -> createNewOrderRequest(restaurant, customer));
+    @Transactional
+    public OrderRequestDto addMenuItemToOrderRequest(Customer customer, Long menuItemId, int quantity) {
+        log.info("Inside addMenuItemToOrderRequest of OrderRequestServiceImpl");
+        try {
+            MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
+            Restaurant menuRestaurant = menuItem.getRestaurant();
+            OrderRequest orderRequest = orderRequestRepository.findByCustomerAndOrderRequestStatus(customer, OrderRequestStatus.PENDING)
+                    .orElseGet(() -> createNewOrderRequest(menuRestaurant, customer));
 
-        MenuItem menuItem = menuItemService.getMenuItemById(menuItemId);
+            if (!orderRequest.getRestaurant().equals(menuRestaurant)) {
+                throw new RuntimeConflictException("Menu item doesn't belong to the restaurant with id:" + menuRestaurant.getId());
+            }
+            OrderItem orderItem = orderItemService.findByOrderRequestAndMenuItem(orderRequest, menuItem)
+                    .orElseGet(() -> createNewOrderItem(orderRequest, menuItem));
+            log.info("Order item: {}", orderItem);
+            orderItem.setQuantity(orderItem.getQuantity() + quantity);
+            OrderItem savedOrderItem = orderItemService.save(orderItem);
+            orderRequest.getOrderItems().add(savedOrderItem);
+            // Recalculate order totals, etc.
+            orderRequest.updateOrderSummary();
+            OrderRequest savedOrderRequest = orderRequestRepository.save(orderRequest);  // Save the OrderRequest to persist the updated order
 
-        if(!menuItem.getRestaurant().equals(restaurant)) {
-            throw new RuntimeConflictException("Menu item doesn't belong to the restaurant with id:"+restaurant.getId());
+
+            return modelMapper.map(savedOrderRequest, OrderRequestDto.class);
+        }catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        OrderItem orderItem = orderItemService.findByOrderRequestAndMenuItem(orderRequest, menuItem)
-                .orElseGet(() -> createNewOrderItem(orderRequest, menuItem));
-        orderItem.setQuantity(orderItem.getQuantity() + quantity);
-        OrderItem savedOrderItem = orderItemService.save(orderItem);
-
-        // Recalculate order totals, etc.
-        orderRequest.updateOrderSummary();
-        OrderRequest savedOrderRequest = orderRequestRepository.save(orderRequest);  // Save the OrderRequest to persist the updated order
-        return modelMapper.map(savedOrderRequest, OrderRequestDto.class);
     }
 
     private OrderItem createNewOrderItem(OrderRequest orderRequest, MenuItem menuItem) {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrderRequest(orderRequest);
         orderItem.setOrder(null);
-        orderItem.setMenuItem(menuItem);
         orderItem.setQuantity(0);
+        orderItem.setMenuItem(menuItem);
         return orderItem;
     }
 
@@ -73,12 +90,14 @@ public class OrderRequestServiceImpl implements OrderRequestService {
         orderRequest.setOrderRequestStatus(OrderRequestStatus.PENDING);
         orderRequest.setCustomer(customer);
         orderRequest.setRestaurant(restaurant);
-        orderRequest.setCreatedAt(LocalDateTime.now());
-        return orderRequest;
+        orderRequest.setOrderItems(new ArrayList<>());
+        orderRequest.setTotalItemCount(0);
+        orderRequest.setTotalPrice(BigDecimal.valueOf(0.0));
+        return orderRequestRepository.save(orderRequest);
     }
 
     @Override
-    public OrderRequestDto deleteMenuItemFromOrderRequest(Restaurant restaurant, Customer customer, Long menuItemId) {
+    public OrderRequestDto deleteMenuItemFromOrderRequest(Customer customer, Long menuItemId) {
         OrderRequest orderRequest = orderRequestRepository.findByCustomerAndOrderRequestStatus(customer, OrderRequestStatus.PENDING)
                 .orElseThrow(() -> new ResourceNotFoundException("OrderRequest not found for customer with id:"+customer.getId()));
 
@@ -91,8 +110,13 @@ public class OrderRequestServiceImpl implements OrderRequestService {
             OrderItem savedOrderItem = orderItemService.save(orderItem);
         }else {
             orderItemService.delete(orderItem.getId());
-        }
+            orderRequest.setOrderItems(orderRequest.getOrderItems().stream()
+                    .filter(orderItem1 -> !orderItem1.getId().equals(orderItem.getId()))
+                            .collect(Collectors.toList())
 
+                    );
+        }
+        log.info("orderRequest is: {}", orderRequest);
         // Recalculate order totals, etc.
         orderRequest.updateOrderSummary();
         OrderRequest savedOrderRequest = orderRequestRepository.save(orderRequest);  // Save the OrderRequest to persist the updated order

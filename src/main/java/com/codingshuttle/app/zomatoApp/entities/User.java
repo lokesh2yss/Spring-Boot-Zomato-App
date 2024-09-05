@@ -3,6 +3,7 @@ package com.codingshuttle.app.zomatoApp.entities;
 import com.codingshuttle.app.zomatoApp.entities.enums.AccountStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.Role;
 import com.codingshuttle.app.zomatoApp.entities.enums.VerificationStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +44,7 @@ public class User implements UserDetails {
     private LocalDate dob;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Address> addresses;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
