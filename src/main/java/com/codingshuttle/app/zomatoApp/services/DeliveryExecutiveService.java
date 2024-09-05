@@ -1,9 +1,13 @@
 package com.codingshuttle.app.zomatoApp.services;
 
 import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.DeliveryExecutiveDto;
+import com.codingshuttle.app.zomatoApp.dto.OrderDto;
 import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
 import com.codingshuttle.app.zomatoApp.entities.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 public interface DeliveryExecutiveService {
     Order acceptOrderDelivery(Order order);
@@ -23,4 +27,10 @@ public interface DeliveryExecutiveService {
     AddressDto setDeliveryExecutiveDefaultAddress(Long  deliveryExecutiveId, Long addressId);
 
     DeliveryExecutive createNewDeliveryExecutive(DeliveryExecutive deliveryExecutive);
+
+    Page<DeliveryExecutive> getAllDeliveryExecutives(PageRequest pageRequest);
+
+    void banDeliveryExecutive(Long deliveryExecutiveId);
+
+    Page<OrderDto> getAllMyOrders(PageRequest pageRequest);
 }

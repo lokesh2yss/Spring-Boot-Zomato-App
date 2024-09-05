@@ -1,22 +1,25 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
-import com.codingshuttle.app.zomatoApp.dto.PointDto;
-import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.MenuItem;
 import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.entities.User;
+import com.codingshuttle.app.zomatoApp.entities.enums.AccountStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.RestaurantRepository;
+import com.codingshuttle.app.zomatoApp.repositories.UserRepository;
 import com.codingshuttle.app.zomatoApp.services.*;
 import com.codingshuttle.app.zomatoApp.strategies.RestaurantStrategyManager;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.lang.module.ResolutionException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,11 +33,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final DeliveryExecutiveService deliveryExecutiveService;
     private final GeoLocationService geoLocationService;
     private final RestaurantStrategyManager restaurantStrategyManager;
+    private final UserRepository userRepository;
+    private final OrderService orderService;
+
     @Override
     public MenuItemDto addMenuItem(MenuItemDto menuItemDto) {
         Restaurant restaurant = getCurrentRestaurant();
         MenuItem menuItem = modelMapper.map(menuItemDto, MenuItem.class);
         menuItem.setRestaurant(restaurant);
+        menuItem.setId(null);
         MenuItem savedMenuItem = menuItemService.addMenuItem(menuItem);
 
         return modelMapper.map(savedMenuItem, MenuItemDto.class);
@@ -164,10 +171,29 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.save(restaurant);
     }
 
-    private Restaurant getCurrentRestaurant() {
-//        TODO add spring security
-        return restaurantRepository.findById(2L)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Restaurant not found with id:"+2));
+    @Override
+    public Page<Restaurant> getAllRestaurants(PageRequest pageRequest) {
+        return restaurantRepository.findAll(pageRequest);
     }
+
+    @Override
+    public void banRestaurant(Long restaurantId) {
+        User user  = getUserByRestaurantId(restaurantId);
+        user.setAccountStatus(AccountStatus.BANNED);
+        userRepository.save(user);
+    }
+
+    @Override
+    public Page<OrderDto> getAllMyOrders(PageRequest pageRequest) {
+        Restaurant restaurant = getCurrentRestaurant();
+        return orderService.getAllOrdersOfRestaurant(restaurant, pageRequest)
+                .map((element) -> modelMapper.map(element, OrderDto.class));
+    }
+
+    private Restaurant getCurrentRestaurant() {
+        User user =  (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return restaurantRepository.findByUser(user).orElseThrow(() ->
+                new ResolutionException("Restaurant not associated with user with id "+user.getId()));
+    }
+
 }

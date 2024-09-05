@@ -5,6 +5,8 @@ import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -53,4 +55,6 @@ public interface CustomerService {
     OrderRequestDto addOrderItemToOrderRequest(Long customerId, OrderRequestItemDto orderRequestItemDto);
 
     OrderRequestDto deleteOrderItemFromOrderRequest(Long customerId, Long menuItemId);
+
+    Page<OrderDto> getAllMyOrders(PageRequest pageRequest);
 }

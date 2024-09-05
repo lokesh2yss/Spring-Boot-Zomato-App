@@ -1,23 +1,29 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.OrderDto;
 import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
 import com.codingshuttle.app.zomatoApp.entities.Order;
+import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.entities.User;
+import com.codingshuttle.app.zomatoApp.entities.enums.AccountStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderDeliveryStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.exceptions.RuntimeConflictException;
 import com.codingshuttle.app.zomatoApp.repositories.DeliveryExecutiveRepository;
-import com.codingshuttle.app.zomatoApp.services.AddressService;
-import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
-import com.codingshuttle.app.zomatoApp.services.OrderService;
+import com.codingshuttle.app.zomatoApp.repositories.UserRepository;
+import com.codingshuttle.app.zomatoApp.services.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
 
 @Service
@@ -27,6 +33,9 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
     private final ModelMapper modelMapper;
     private final AddressService addressService;
     private final OrderService orderService;
+    private final PaymentService paymentService;
+    private final RatingService ratingService;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -39,7 +48,12 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         }
         order.setOrderDeliveryStatus(OrderDeliveryStatus.DELIVERY_ASSIGNED);
         order.setDeliveryExecutive(getCurrentDeliveryExecutive());
-        return orderService.updateOrder(order);
+
+        Order savedOrder = orderService.updateOrder(order);
+        paymentService.createNewPayment(savedOrder);
+        ratingService.createNewRating(savedOrder);
+
+        return savedOrder;
     }
 
     @Override
@@ -75,7 +89,9 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         }
         order.setOrderDeliveryStatus(OrderDeliveryStatus.DELIVERED);
         order.setDeliveredAt(LocalDateTime.now());
-        return orderService.updateOrder(order);
+        Order updatedOrder = orderService.updateOrder(order);
+        paymentService.processPayment(updatedOrder);
+        return updatedOrder;
     }
 
     @Override
@@ -124,6 +140,25 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         return deliveryExecutiveRepository.save(deliveryExecutive);
     }
 
+    @Override
+    public Page<DeliveryExecutive> getAllDeliveryExecutives(PageRequest pageRequest) {
+        return deliveryExecutiveRepository.findAll(pageRequest);
+    }
+
+    @Override
+    public void banDeliveryExecutive(Long deliveryExecutiveId) {
+        User user = getUserByDeliveryExecutiveId(deliveryExecutiveId);
+        user.setAccountStatus(AccountStatus.BANNED);
+        userRepository.save(user);
+    }
+
+    @Override
+    public Page<OrderDto> getAllMyOrders(PageRequest pageRequest) {
+        DeliveryExecutive deliveryExecutive = getCurrentDeliveryExecutive();
+        return orderService.getAllOrdersOfDeliveryExecutive(deliveryExecutive, pageRequest)
+                .map((element) -> modelMapper.map(element, OrderDto.class));
+    }
+
     private User getUserByDeliveryExecutiveId(Long deliveryExecutiveId) {
         DeliveryExecutive deliveryExecutive = deliveryExecutiveRepository.findById(deliveryExecutiveId)
                 .orElseThrow(() -> new ResourceNotFoundException("Delivery Executive not found with id="+deliveryExecutiveId));
@@ -131,8 +166,10 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         return deliveryExecutive.getUser();
     }
     private DeliveryExecutive getCurrentDeliveryExecutive() {
-        return deliveryExecutiveRepository.findById(3L)
+        User user =  (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return deliveryExecutiveRepository.findByUser(user)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Delivery executive not found with id:"+3));
+                        new ResourceNotFoundException("Delivery executive not associated with user with id: "+user.getId()));
     }
+
 }

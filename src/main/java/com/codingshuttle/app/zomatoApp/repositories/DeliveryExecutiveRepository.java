@@ -1,12 +1,14 @@
 package com.codingshuttle.app.zomatoApp.repositories;
 
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
+import com.codingshuttle.app.zomatoApp.entities.User;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DeliveryExecutiveRepository extends JpaRepository<DeliveryExecutive, Long> {
@@ -25,4 +27,6 @@ public interface DeliveryExecutiveRepository extends JpaRepository<DeliveryExecu
             "ORDER BY d.rating DESC " +
             "LIMIT 10", nativeQuery = true)
     List<DeliveryExecutive> findTenNearbyTopRatedDeliveryExecutives(Point restaurantLocation);
+
+    Optional<DeliveryExecutive> findByUser(User user);
 }

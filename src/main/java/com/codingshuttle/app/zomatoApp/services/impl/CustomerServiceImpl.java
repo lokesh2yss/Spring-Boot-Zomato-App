@@ -9,10 +9,13 @@ import com.codingshuttle.app.zomatoApp.repositories.CustomerRepository;
 import com.codingshuttle.app.zomatoApp.services.AddressService;
 import com.codingshuttle.app.zomatoApp.services.CustomerService;
 import com.codingshuttle.app.zomatoApp.services.OrderRequestService;
+import com.codingshuttle.app.zomatoApp.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final ModelMapper modelMapper;
     private final AddressService addressService;
     private final OrderRequestService orderRequestService;
+    private final OrderService orderService;
 
     @Override
     public Customer getCustomerById(Long customerId) {
@@ -153,6 +157,13 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = getCurrentCustomer();
         log.info("Retrieved currentCustomer in addOrderItemToOrderRequest {}", customer);
         return orderRequestService.deleteMenuItemFromOrderRequest(customer, menuItemId);
+    }
+
+    @Override
+    public Page<OrderDto> getAllMyOrders(PageRequest pageRequest) {
+        Customer customer = getCurrentCustomer();
+        return orderService.getAllOrdersOfCustomer(customer, pageRequest)
+                .map((element) -> modelMapper.map(element, OrderDto.class));
     }
 
     private Customer getCurrentCustomer() {

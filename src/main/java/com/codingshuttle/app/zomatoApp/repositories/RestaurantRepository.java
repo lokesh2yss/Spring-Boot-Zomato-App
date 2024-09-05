@@ -1,12 +1,14 @@
 package com.codingshuttle.app.zomatoApp.repositories;
 
 import com.codingshuttle.app.zomatoApp.entities.Restaurant;
+import com.codingshuttle.app.zomatoApp.entities.User;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
@@ -29,4 +31,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
             "ORDER BY r.rating DESC " +
             "LIMIT 20", nativeQuery = true)
     List<Restaurant> findTwentyNearbyTopRatedRestaurants(Point customerLocation);
+
+    Optional<Restaurant> findByUser(User user);
 }

@@ -107,22 +107,24 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Page<RestaurantDto> getAllRestaurants(PageRequest pageRequest) {
-        return null;
+        return restaurantService.getAllRestaurants(pageRequest)
+                .map((element) -> modelMapper.map(element, RestaurantDto.class));
     }
 
     @Override
     public Page<DeliveryExecutiveDto> getAllDeliveryExecutive(PageRequest pageRequest) {
-        return null;
+        return deliveryExecutiveService.getAllDeliveryExecutives(pageRequest)
+                .map((element) -> modelMapper.map(element, DeliveryExecutiveDto.class));
     }
 
     @Override
-    public boolean banDeliveryExecutive(Long deliveryExecutiveId) {
-        return false;
+    public void banDeliveryExecutive(Long deliveryExecutiveId) {
+        deliveryExecutiveService.banDeliveryExecutive(deliveryExecutiveId);
     }
 
     @Override
-    public boolean banRestaurant(Long restaurantId) {
-        return false;
+    public void banRestaurant(Long restaurantId) {
+        restaurantService.banRestaurant(restaurantId);
     }
 
     private User getUserById(Long userId) {

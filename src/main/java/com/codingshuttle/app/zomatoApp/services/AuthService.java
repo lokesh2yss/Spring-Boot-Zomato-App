@@ -19,7 +19,7 @@ public interface AuthService {
 
     Page<DeliveryExecutiveDto> getAllDeliveryExecutive(PageRequest pageRequest);
 
-    boolean banDeliveryExecutive(Long deliveryExecutiveId);
+    void banDeliveryExecutive(Long deliveryExecutiveId);
 
-    boolean banRestaurant(Long restaurantId);
+    void banRestaurant(Long restaurantId);
 }
