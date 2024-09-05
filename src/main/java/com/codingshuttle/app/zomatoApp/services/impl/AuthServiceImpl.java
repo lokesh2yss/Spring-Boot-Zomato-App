@@ -91,14 +91,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public DeliveryExecutiveDto onboardDeliveryExecutive(Long userId) {
+    public DeliveryExecutiveDto onboardNewDeliveryExecutive(Long userId, OnboardDeliveryExecutiveDto onboardDeliveryExecutiveDto) {
         User user = getUserById(userId);
-        user.setRoles(Set.of(Role.DELIVERY_EXECUTIVE));
+        if(user.getRoles().contains(Role.DELIVERY_EXECUTIVE)) {
+            throw new RuntimeConflictException("User with id: "+user.getId()+"already onboarded as a delivery executive");
+        }
+        user.getRoles().add(Role.DELIVERY_EXECUTIVE);
         User savedUser = userRepository.save(user);
-        DeliveryExecutive deliveryExecutive = new DeliveryExecutive();
+        DeliveryExecutive deliveryExecutive = modelMapper.map(onboardDeliveryExecutiveDto, DeliveryExecutive.class);
         deliveryExecutive.setUser(savedUser);
+        deliveryExecutive.setRating(0.0);
+        DeliveryExecutive savedDeliveryExecutive = deliveryExecutiveService.createNewDeliveryExecutive(deliveryExecutive);
 
-        return modelMapper.map(deliveryExecutive, DeliveryExecutiveDto.class);
+        return modelMapper.map(savedDeliveryExecutive, DeliveryExecutiveDto.class);
     }
 
     @Override

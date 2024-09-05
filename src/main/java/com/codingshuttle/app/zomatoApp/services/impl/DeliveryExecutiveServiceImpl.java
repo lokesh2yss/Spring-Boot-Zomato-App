@@ -118,6 +118,12 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         User user = getUserByDeliveryExecutiveId(deliveryExecutiveId);
         return addressService.setDefaultAddressForUser(user.getId(), addressId);
     }
+
+    @Override
+    public DeliveryExecutive createNewDeliveryExecutive(DeliveryExecutive deliveryExecutive) {
+        return deliveryExecutiveRepository.save(deliveryExecutive);
+    }
+
     private User getUserByDeliveryExecutiveId(Long deliveryExecutiveId) {
         DeliveryExecutive deliveryExecutive = deliveryExecutiveRepository.findById(deliveryExecutiveId)
                 .orElseThrow(() -> new ResourceNotFoundException("Delivery Executive not found with id="+deliveryExecutiveId));

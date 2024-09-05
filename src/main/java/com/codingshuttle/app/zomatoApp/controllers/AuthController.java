@@ -37,6 +37,11 @@ public class AuthController {
         return new ResponseEntity<>(authService.onboardNewRestaurant(userId, onboardRestaurantDto), HttpStatus.CREATED);
     }
 
+    @PostMapping(path = "/onboardNewDeliveryExecutive/{userId}")
+    public ResponseEntity<DeliveryExecutiveDto> onboardNewDeliveryExecutive(@PathVariable Long userId, @RequestBody OnboardDeliveryExecutiveDto onboardDeliveryExecutiveDto) {
+        return new ResponseEntity<>(authService.onboardNewDeliveryExecutive(userId, onboardDeliveryExecutiveDto), HttpStatus.CREATED);
+    }
+
     @PostMapping(path = "/refresh")
     public ResponseEntity<LoginResponseDto> refresh(HttpServletRequest request) {
         String refreshToken = Arrays.stream(request.getCookies())

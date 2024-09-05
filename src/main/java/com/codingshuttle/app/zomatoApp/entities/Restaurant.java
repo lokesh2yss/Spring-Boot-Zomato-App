@@ -39,9 +39,12 @@ public class Restaurant {
 
     private Time closingTime;
 
+    @Enumerated(EnumType.STRING)
     private RestaurantOpenStatus openStatus;
 
+    @Enumerated(EnumType.STRING)
     private RestaurantCategory category;
 
+    @Enumerated(EnumType.STRING)
     private RestaurantCuisine cuisine;
 }

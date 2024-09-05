@@ -13,7 +13,7 @@ public interface AuthService {
 
     RestaurantDto onboardNewRestaurant(Long userId, OnboardRestaurantDto onboardRestaurantDto);
 
-    DeliveryExecutiveDto onboardDeliveryExecutive(Long userId);
+    DeliveryExecutiveDto onboardNewDeliveryExecutive(Long userId, OnboardDeliveryExecutiveDto onboardDeliveryExecutiveDto);
 
     Page<RestaurantDto> getAllRestaurants(PageRequest pageRequest);
 
@@ -22,6 +22,4 @@ public interface AuthService {
     boolean banDeliveryExecutive(Long deliveryExecutiveId);
 
     boolean banRestaurant(Long restaurantId);
-
-
 }

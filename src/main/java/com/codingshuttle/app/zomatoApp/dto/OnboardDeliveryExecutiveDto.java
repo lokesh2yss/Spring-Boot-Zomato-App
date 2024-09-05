@@ -9,13 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeliveryExecutiveDto {
-    private Long id;
-
-    private UserDto user;
-
-    private Double rating;
-
+public class OnboardDeliveryExecutiveDto {
     private AvailableStatus availableStatus;
 
     private VerificationStatus verificationStatus;
