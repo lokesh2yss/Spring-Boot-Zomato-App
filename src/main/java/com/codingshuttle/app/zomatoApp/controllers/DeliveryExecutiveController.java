@@ -1,8 +1,9 @@
 package com.codingshuttle.app.zomatoApp.controllers;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,6 +12,32 @@ import org.springframework.web.bind.annotation.*;
 public class DeliveryExecutiveController {
 
     private final DeliveryExecutiveService deliveryExecutiveService;
+
+    @PostMapping(path = "/{deliveryExecutiveId}/orders/{orderId}/accept")
+    public ResponseEntity<OrderDto> acceptOrderDelivery(@PathVariable Long deliveryExecutiveId,
+                                                        @PathVariable Long orderId) {
+        return ResponseEntity.ok(deliveryExecutiveService.acceptOrderDelivery(orderId));
+    }
+
+    @PostMapping(path = "/{deliveryExecutiveId}/orders/{orderId}/pickup")
+    public ResponseEntity<OrderDto> pickOrderForDelivery(@PathVariable Long deliveryExecutiveId,
+                                                         @PathVariable Long orderId,
+                                                         @RequestBody OrderPickupDto pickupDto) {
+        return ResponseEntity.ok(deliveryExecutiveService.pickupOrderForDelivery(orderId, pickupDto.getPickupOtp()));
+    }
+
+    @PostMapping(path = "/{deliveryExecutiveId}/orders/{orderId}/complete")
+    public ResponseEntity<OrderDto> completeOrderDelivery(@PathVariable Long deliveryExecutiveId,
+                                                          @PathVariable Long orderId,
+                                                          @RequestBody OrderCompleteDto orderCompleteDto) {
+        return ResponseEntity.ok(deliveryExecutiveService.completeOrderDelivery(orderId, orderCompleteDto.getDeliveryOtp()));
+    }
+
+    @GetMapping(path = "/{deliveryExecutiveId}/orders/{orderId}/getLiveLocation")
+    public ResponseEntity<PointDto> getDeliveryExecutiveLiveLocation(@PathVariable Long deliveryExecutiveId,
+                                                                     @PathVariable Long orderId) {
+        return ResponseEntity.ok(deliveryExecutiveService.getDeliveryExecutiveLiveLocation(orderId));
+    }
 
     @PostMapping("/{deliveryExecutiveId}/addresses")
     public AddressDto addAddress(

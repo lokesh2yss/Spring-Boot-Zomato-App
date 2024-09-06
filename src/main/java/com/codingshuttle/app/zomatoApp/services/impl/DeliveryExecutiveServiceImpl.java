@@ -39,8 +39,9 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
 
     @Override
     @Transactional
-    public Order acceptOrderDelivery(Order order) {
-        if(order.getOrderDeliveryStatus() != null) {
+    public OrderDto acceptOrderDelivery(Long orderId) {
+        Order order = orderService.getOrderById(orderId);
+        if(order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.NOT_ASSIGNED)) {
             throw new RuntimeException("Invalid order delivery status:"+order.getOrderDeliveryStatus());
         }
         if(order.getDeliveryExecutive() != null) {
@@ -53,12 +54,13 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         paymentService.createNewPayment(savedOrder);
         ratingService.createNewRating(savedOrder);
 
-        return savedOrder;
+        return modelMapper.map(savedOrder, OrderDto.class);
     }
 
     @Override
-    public Order pickupOrderForDelivery(Order order, String pickupOtp) {
-        if(order.getOrderDeliveryStatus() != null) {
+    public OrderDto pickupOrderForDelivery(Long orderId, String pickupOtp) {
+        Order order = orderService.getOrderById(orderId);
+        if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.DELIVERY_ASSIGNED)) {
             throw new RuntimeException("Order delivery status is invalid:"+order.getOrderDeliveryStatus());
         }
         DeliveryExecutive deliveryExecutive = getCurrentDeliveryExecutive();
@@ -72,11 +74,12 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         order.setOrderDeliveryStatus(OrderDeliveryStatus.PICKED_UP);
         order.setPickedAt(LocalDateTime.now());
 
-        return orderService.updateOrder(order);
+        return modelMapper.map(orderService.updateOrder(order), OrderDto.class);
     }
 
     @Override
-    public Order completeOrderDelivery(Order order, String deliveryOtp) {
+    public OrderDto completeOrderDelivery(Long orderId, String deliveryOtp) {
+        Order order = orderService.getOrderById(orderId);
         if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.PICKED_UP)) {
             throw new RuntimeException("Order delivery status is invalid:"+order.getOrderDeliveryStatus());
         }
@@ -91,7 +94,7 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         order.setDeliveredAt(LocalDateTime.now());
         Order updatedOrder = orderService.updateOrder(order);
         paymentService.processPayment(updatedOrder);
-        return updatedOrder;
+        return modelMapper.map(updatedOrder, OrderDto.class);
     }
 
     @Override

@@ -1,10 +1,12 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.entities.*;
+import com.codingshuttle.app.zomatoApp.entities.enums.OrderDeliveryStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderRequestStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.PaymentMethod;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
+import com.codingshuttle.app.zomatoApp.repositories.OrderItemRepository;
 import com.codingshuttle.app.zomatoApp.repositories.OrderRepository;
 import com.codingshuttle.app.zomatoApp.services.AddressService;
 import com.codingshuttle.app.zomatoApp.services.OrderRequestService;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,8 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
     private final OrderRequestService orderRequestService;
     private final AddressService addressService;
+    private final OrderItemRepository orderItemRepository;
+
     @Override
     public Order getOrderById(Long orderId) {
         return orderRepository.findById(orderId)
@@ -39,17 +44,20 @@ public class OrderServiceImpl implements OrderService {
         Order order = modelMapper.map(orderRequest, Order.class);
         order.setId(null);
         order.setOrderStatus(OrderStatus.CONFIRMED);
+        order.setOrderDeliveryStatus(OrderDeliveryStatus.NOT_ASSIGNED);
         order.setPaymentMethod(paymentMethod);
         order.setDeliveryAddress(deliveryAddress);
 
-        //order.setDeliveryExecutive(deliveryExecutive);
         order.setPickupOtp(generateRandomOtp());
         order.setDeliveryOtp(generateRandomOtp());
         order.setPlacedAt(LocalDateTime.now());
 
+        Order savedOrder = orderRepository.save(order);
+        orderRequest.getOrderItems()
+                        .forEach(orderItem -> orderItem.setOrder(savedOrder));
         orderRequestService.update(orderRequest);
 
-        return orderRepository.save(order);
+        return savedOrder;
     }
 
     @Override

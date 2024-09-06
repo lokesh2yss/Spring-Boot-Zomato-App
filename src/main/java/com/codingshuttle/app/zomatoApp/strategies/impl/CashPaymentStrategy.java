@@ -4,6 +4,7 @@ import com.codingshuttle.app.zomatoApp.entities.Order;
 import com.codingshuttle.app.zomatoApp.entities.Payment;
 import com.codingshuttle.app.zomatoApp.entities.enums.PaymentStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.TransactionMethod;
+import com.codingshuttle.app.zomatoApp.repositories.PaymentRepository;
 import com.codingshuttle.app.zomatoApp.services.PaymentService;
 import com.codingshuttle.app.zomatoApp.services.WalletService;
 import com.codingshuttle.app.zomatoApp.strategies.PaymentStrategy;
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class CashPaymentStrategy implements PaymentStrategy {
     private final WalletService walletService;
-    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
     @Override
     public void processPayment(Payment payment) {
         Order order = payment.getOrder();
@@ -27,6 +28,7 @@ public class CashPaymentStrategy implements PaymentStrategy {
 
         walletService.deductMoneyFromWallet(order.getDeliveryExecutive().getUser(), platformCommission.add(amountPayableToRestaurant), order, null, TransactionMethod.ORDER);
         walletService.addMoneyToWallet(order.getRestaurant().getUser(), amountPayableToRestaurant, order, null, TransactionMethod.ORDER);
-        paymentService.updatePaymentStatus(payment, PaymentStatus.CONFIRMED);
+        payment.setPaymentStatus(PaymentStatus.CONFIRMED);
+        paymentRepository.save(payment);
     }
 }

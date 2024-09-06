@@ -25,15 +25,15 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="customer_id")
     private Customer customer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="restaurant_id")
     private Restaurant restaurant;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_executive_id")
     private DeliveryExecutive deliveryExecutive;
 
@@ -43,7 +43,7 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
-    @OneToOne(mappedBy = "order", optional = false)
+    @OneToOne(mappedBy = "order")
     private Payment payment;
 
     @Enumerated(EnumType.STRING)

@@ -14,7 +14,7 @@ public interface CustomerService {
 
     Customer getCustomerById(Long customerId);
 
-    OrderDto placeOrder(OrderRequestDto orderRequestDto);
+    OrderDto placeOrder(Long customerId, ConfirmOrderDto confirmOrderDto);
 
     OrderDto cancelOrder(Long orderId);
 

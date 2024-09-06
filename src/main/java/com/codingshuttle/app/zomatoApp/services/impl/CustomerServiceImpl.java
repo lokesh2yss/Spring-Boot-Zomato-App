@@ -2,7 +2,10 @@ package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.entities.Customer;
+import com.codingshuttle.app.zomatoApp.entities.Order;
+import com.codingshuttle.app.zomatoApp.entities.OrderRequest;
 import com.codingshuttle.app.zomatoApp.entities.User;
+import com.codingshuttle.app.zomatoApp.entities.enums.OrderRequestStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.repositories.CustomerRepository;
@@ -10,6 +13,7 @@ import com.codingshuttle.app.zomatoApp.services.AddressService;
 import com.codingshuttle.app.zomatoApp.services.CustomerService;
 import com.codingshuttle.app.zomatoApp.services.OrderRequestService;
 import com.codingshuttle.app.zomatoApp.services.OrderService;
+import com.codingshuttle.app.zomatoApp.strategies.DeliveryExecutiveStrategyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
@@ -31,6 +35,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final AddressService addressService;
     private final OrderRequestService orderRequestService;
     private final OrderService orderService;
+    private final DeliveryExecutiveStrategyManager deliveryExecutiveStrategyManager;
 
     @Override
     public Customer getCustomerById(Long customerId) {
@@ -40,8 +45,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public OrderDto placeOrder(OrderRequestDto orderRequestDto) {
-        return null;
+    public OrderDto placeOrder(Long customerId, ConfirmOrderDto confirmOrderDto) {
+        Customer customer = getCurrentCustomer();
+        OrderRequest orderRequest = orderRequestService.findOrderRequestByCustomerAndRequestStatus(customer, OrderRequestStatus.PENDING);
+        Order savedOrder = orderService.createNewOrder(orderRequest, confirmOrderDto.getPaymentMethod(), confirmOrderDto.getAddressId());
+
+        deliveryExecutiveStrategyManager.deliveryExecutiveMatchingStrategy(customer.getRating()).findMatchingDeliveryExecutives(savedOrder);
+        return modelMapper.map(savedOrder, OrderDto.class);
     }
 
     @Override

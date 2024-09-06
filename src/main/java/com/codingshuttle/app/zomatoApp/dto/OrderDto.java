@@ -1,5 +1,6 @@
 package com.codingshuttle.app.zomatoApp.dto;
 
+import com.codingshuttle.app.zomatoApp.entities.enums.OrderDeliveryStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.PaymentMethod;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 public class OrderDto {
     private Long id;
 
-    private Double totalAmount;
+    private Double totalPrice;
 
     private List<OrderItemDto> orderItems;
 
@@ -30,6 +31,8 @@ public class OrderDto {
     private AddressDto deliveryAddress;
 
     private OrderStatus orderStatus;
+
+    private OrderDeliveryStatus orderDeliveryStatus;
 
     private String pickupOtp;
 

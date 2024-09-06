@@ -8,12 +8,12 @@ import com.codingshuttle.app.zomatoApp.entities.enums.TransactionMethod;
 import java.math.BigDecimal;
 
 public interface WalletService {
-    Wallet createNewWallet(User user);
+    void createNewWallet(User user);
     Wallet findWalletByUser(User user);
 
-    Wallet addMoneyToWallet(User user, BigDecimal amount, Order order, String transactionId, TransactionMethod transactionMethod);
+    void addMoneyToWallet(User user, BigDecimal amount, Order order, String transactionId, TransactionMethod transactionMethod);
 
-    Wallet deductMoneyFromWallet(User user, BigDecimal amount, Order order, String transactionId, TransactionMethod transactionMethod);
+    void deductMoneyFromWallet(User user, BigDecimal amount, Order order, String transactionId, TransactionMethod transactionMethod);
 
 
 }

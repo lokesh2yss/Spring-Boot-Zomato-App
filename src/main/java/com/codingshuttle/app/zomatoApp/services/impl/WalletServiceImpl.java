@@ -20,12 +20,12 @@ public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
     @Override
-    public Wallet createNewWallet(User user) {
+    public void createNewWallet(User user) {
         Wallet wallet = Wallet.builder()
                 .user(user)
                 .balance(BigDecimal.valueOf(0.0))
                 .build();
-        return walletRepository.save(wallet);
+        walletRepository.save(wallet);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Wallet addMoneyToWallet(User user, BigDecimal amount, Order order, String transactionId, TransactionMethod transactionMethod) {
+    public void addMoneyToWallet(User user, BigDecimal amount, Order order, String transactionId, TransactionMethod transactionMethod) {
         Wallet wallet = findWalletByUser(user);
         wallet.setBalance(wallet.getBalance().add(amount));
 
@@ -50,11 +50,11 @@ public class WalletServiceImpl implements WalletService {
 
         wallet.getTransactions().add(walletTransaction);
 
-        return walletRepository.save(wallet);
+        walletRepository.save(wallet);
     }
 
     @Override
-    public Wallet deductMoneyFromWallet(User user, BigDecimal amount, Order order, String transactionId, TransactionMethod transactionMethod) {
+    public void deductMoneyFromWallet(User user, BigDecimal amount, Order order, String transactionId, TransactionMethod transactionMethod) {
         Wallet wallet = findWalletByUser(user);
         wallet.setBalance(wallet.getBalance().subtract(amount));
 
@@ -68,6 +68,6 @@ public class WalletServiceImpl implements WalletService {
 
         wallet.getTransactions().add(walletTransaction);
 
-        return walletRepository.save(wallet);
+        walletRepository.save(wallet);
     }
 }

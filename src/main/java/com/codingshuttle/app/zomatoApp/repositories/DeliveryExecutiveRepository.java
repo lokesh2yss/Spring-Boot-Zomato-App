@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface DeliveryExecutiveRepository extends JpaRepository<DeliveryExecutive, Long> {
     @Query(value = "SELECT d.*, ST_Distance(d.current_location, :restaurantLocation) AS distance " +
             "FROM delivery_executives d " +
-            "WHERE d.available_status=AVAILABLE " +
+            "WHERE d.available_status='AVAILABLE' " +
             "AND ST_DWithin(d.current_location, :restaurantLocation, 10000) " +
             "ORDER BY distance ASC " +
             "LIMIT 10", nativeQuery = true)
@@ -22,7 +22,7 @@ public interface DeliveryExecutiveRepository extends JpaRepository<DeliveryExecu
 
     @Query(value = "SELECT d.* " +
             "FROM delivery_executives d " +
-            "WHERE d.available_status=AVAILABLE " +
+            "WHERE d.available_status='AVAILABLE' " +
             "AND ST_DWithin(d.current_location, :restaurantLocation, 15000) " +
             "ORDER BY d.rating DESC " +
             "LIMIT 10", nativeQuery = true)

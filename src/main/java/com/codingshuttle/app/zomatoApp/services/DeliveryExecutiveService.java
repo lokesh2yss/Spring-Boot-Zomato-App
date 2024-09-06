@@ -10,11 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 public interface DeliveryExecutiveService {
-    Order acceptOrderDelivery(Order order);
+    OrderDto acceptOrderDelivery(Long orderId);
 
-    Order pickupOrderForDelivery(Order order, String pickupOtp);
+    OrderDto pickupOrderForDelivery(Long orderId, String pickupOtp);
 
-    Order completeOrderDelivery(Order order, String deliveryOtp);
+    OrderDto completeOrderDelivery(Long orderId, String deliveryOtp);
     PointDto getDeliveryExecutiveLiveLocation(Long orderId);
     AddressDto addDeliveryExecutiveAddress(Long deliveryExecutiveId, AddressDto addressDto);
 

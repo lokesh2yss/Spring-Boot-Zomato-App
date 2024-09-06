@@ -36,6 +36,14 @@ public class OrderRequestServiceImpl implements OrderRequestService {
     }
 
     @Override
+    public OrderRequest findOrderRequestByCustomerAndRequestStatus(Customer customer, OrderRequestStatus orderRequestStatus) {
+        return orderRequestRepository.findByCustomerAndOrderRequestStatus(customer, orderRequestStatus)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("OrderRequest not found with customer associated with id: "+
+                                customer.getId()+" with status PENDING"));
+    }
+
+    @Override
     public void update(OrderRequest orderRequest) {
         orderRequestRepository.findById(orderRequest.getId())
                 .orElseThrow(() ->

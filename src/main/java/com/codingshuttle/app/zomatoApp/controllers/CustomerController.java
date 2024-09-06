@@ -1,8 +1,6 @@
 package com.codingshuttle.app.zomatoApp.controllers;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderRequestDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderRequestItemDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.services.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerController {
     private final CustomerService customerService;
 
+    @PostMapping(path = "/{customerId}/orders/")
+    public ResponseEntity<OrderDto> placeOrder(@PathVariable Long customerId, @RequestBody ConfirmOrderDto confirmOrderDto) {
+        return ResponseEntity.ok(customerService.placeOrder(customerId, confirmOrderDto));
+    }
     @DeleteMapping(path = "/{customerId}/order-requests/{menuItemId}")
     public ResponseEntity<OrderRequestDto> deleteOrderItemFromOrderRequest(@PathVariable Long customerId, @PathVariable Long menuItemId) {
         return ResponseEntity.ok(customerService.deleteOrderItemFromOrderRequest(customerId, menuItemId));

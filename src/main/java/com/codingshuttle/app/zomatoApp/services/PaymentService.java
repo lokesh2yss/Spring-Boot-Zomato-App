@@ -7,7 +7,7 @@ import com.codingshuttle.app.zomatoApp.entities.enums.PaymentStatus;
 public interface PaymentService {
     void processPayment(Order order);
 
-    Payment createNewPayment(Order order);
+    void createNewPayment(Order order);
 
     void updatePaymentStatus(Payment payment, PaymentStatus paymentStatus);
 }
