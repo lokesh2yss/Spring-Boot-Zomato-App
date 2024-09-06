@@ -1,9 +1,6 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.LiveLocationResponseDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderDto;
-import com.codingshuttle.app.zomatoApp.dto.PointDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
 import com.codingshuttle.app.zomatoApp.entities.Order;
 import com.codingshuttle.app.zomatoApp.entities.User;
@@ -165,6 +162,27 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
                 .map((element) -> modelMapper.map(element, OrderDto.class));
     }
 
+    @Override
+    public CustomerDto rateCustomer(Long deliveryExecutiveId, Long orderId, Integer rating) {
+        DeliveryExecutive deliveryExecutive = getCurrentDeliveryExecutive();
+        validateDeliveryExecutive(deliveryExecutive, deliveryExecutiveId);
+        Order order = orderService.getOrderById(orderId);
+        if(!order.getDeliveryExecutive().equals(deliveryExecutive)) {
+            throw new RuntimeConflictException("The delivery executive cannot rate as the " +
+                    "order doesn't belong to delivery executive with id: "+deliveryExecutive.getId());
+        }
+        if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.DELIVERED)) {
+            throw new RuntimeConflictException("Order has not been delivered yet"+
+                    ", so cannot start rating, status: "+order.getOrderDeliveryStatus());
+        }
+        return ratingService.rateCustomer(order, rating);
+    }
+
+    @Override
+    public DeliveryExecutive update(DeliveryExecutive deliveryExecutive) {
+        return deliveryExecutiveRepository.save(deliveryExecutive);
+    }
+
     private User getUserByDeliveryExecutiveId(Long deliveryExecutiveId) {
         DeliveryExecutive deliveryExecutive = deliveryExecutiveRepository.findById(deliveryExecutiveId)
                 .orElseThrow(() -> new ResourceNotFoundException("Delivery Executive not found with id="+deliveryExecutiveId));
@@ -176,6 +194,12 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
         return deliveryExecutiveRepository.findByUser(user)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Delivery executive not associated with user with id: "+user.getId()));
+    }
+
+    private void validateDeliveryExecutive(DeliveryExecutive deliveryExecutive, Long deliveryExecutiveId) {
+        if(!deliveryExecutive.getId().equals(deliveryExecutiveId)) {
+            throw new RuntimeConflictException("The deliveryExecutive not logged in with id: "+deliveryExecutiveId);
+        }
     }
 
 }

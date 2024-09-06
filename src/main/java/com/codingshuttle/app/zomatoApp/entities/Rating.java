@@ -1,27 +1,35 @@
 package com.codingshuttle.app.zomatoApp.entities;
 
-import com.codingshuttle.app.zomatoApp.entities.enums.RatingType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Table(name="ratings")
 public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="order_id")
+    @OneToOne
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne
+    private Restaurant restaurant;
 
-    @Enumerated(EnumType.STRING)
-    private RatingType ratingType;
+    @ManyToOne
+    private Customer customer;
+
+    @ManyToOne
+    private DeliveryExecutive deliveryExecutive;
+
+    private Integer customerRating;
+
+    private Integer restaurantRating;
+
+    private Integer deliveryExecutiveRating;
 }

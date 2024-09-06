@@ -42,9 +42,9 @@ public class WalletServiceImpl implements WalletService {
 
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .wallet(wallet)
-                .transactionRefId(null)
+                .transactionRefId(transactionId)
                 .transactionType(TransactionType.CREDIT)
-                .transactionMethod(TransactionMethod.ORDER)
+                .transactionMethod(transactionMethod)
                 .order(order)
                 .build();
 
@@ -60,9 +60,9 @@ public class WalletServiceImpl implements WalletService {
 
         WalletTransaction walletTransaction = WalletTransaction.builder()
                 .wallet(wallet)
-                .transactionRefId(null)
+                .transactionRefId(transactionId)
                 .transactionType(TransactionType.DEBIT)
-                .transactionMethod(TransactionMethod.ORDER)
+                .transactionMethod(transactionMethod)
                 .order(order)
                 .build();
 

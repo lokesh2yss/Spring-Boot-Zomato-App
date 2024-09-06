@@ -1,6 +1,7 @@
 package com.codingshuttle.app.zomatoApp.services;
 
 import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.CustomerDto;
 import com.codingshuttle.app.zomatoApp.dto.LiveLocationResponseDto;
 import com.codingshuttle.app.zomatoApp.dto.OrderDto;
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
@@ -32,4 +33,8 @@ public interface DeliveryExecutiveService {
     void banDeliveryExecutive(Long deliveryExecutiveId);
 
     Page<OrderDto> getAllMyOrders(PageRequest pageRequest);
+
+    CustomerDto rateCustomer(Long deliveryExecutiveId, Long orderId, Integer rating);
+
+    DeliveryExecutive update(DeliveryExecutive deliveryExecutive);
 }

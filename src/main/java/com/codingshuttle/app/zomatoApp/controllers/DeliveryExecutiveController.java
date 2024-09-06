@@ -1,9 +1,6 @@
 package com.codingshuttle.app.zomatoApp.controllers;
 
-import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderCompleteDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderDto;
-import com.codingshuttle.app.zomatoApp.dto.OrderPickupDto;
+import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,6 +32,13 @@ public class DeliveryExecutiveController {
                                                           @PathVariable Long orderId,
                                                           @RequestBody OrderCompleteDto orderCompleteDto) {
         return ResponseEntity.ok(deliveryExecutiveService.completeOrderDelivery(orderId, orderCompleteDto.getDeliveryOtp()));
+    }
+
+    @PostMapping(path = "/{deliveryExecutiveId}/orders/{orderId}/rateCustomer")
+    public ResponseEntity<CustomerDto> rateCustomer(@PathVariable Long deliveryExecutiveId,
+                                                        @PathVariable Long orderId,
+                                                        @RequestBody RatingDto ratingDto) {
+        return ResponseEntity.ok(deliveryExecutiveService.rateCustomer(deliveryExecutiveId, orderId, ratingDto.getRating()));
     }
 
     @PostMapping("/{deliveryExecutiveId}/addresses")

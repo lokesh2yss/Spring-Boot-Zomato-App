@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.lang.module.ResolutionException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -35,6 +36,8 @@ public class CustomerServiceImpl implements CustomerService {
     private final OrderService orderService;
     private final DeliveryExecutiveStrategyManager deliveryExecutiveStrategyManager;
     private final RestaurantService restaurantService;
+    private final PaymentService paymentService;
+    private final RatingService ratingService;
 
     @Override
     public CustomerDto getCustomerById(Long customerId) {
@@ -114,38 +117,69 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public OrderStatusDto getCustomerOrderStatus(Long customerId, Long orderId) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        Order order = orderService.getOrderById(orderId);
+        OrderStatusDto orderStatusDto = new OrderStatusDto();
+        orderStatusDto.setOrderStatus(order.getOrderStatus());
+        orderStatusDto.setOrderDeliveryStatus(order.getOrderDeliveryStatus());
+        return orderStatusDto;
+    }
+
+    @Override
+    public boolean tipDeliveryExecutive(Long customerId, Long orderId, BigDecimal amount) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        Order order = orderService.getOrderById(orderId);
+        if(!order.getCustomer().equals(customer)) {
+            throw new RuntimeConflictException("The customer with id: "+ customer.getId()+ "cannot give tip to " +
+                    "delivery executive associated with order with id: "+order.getId());
+        }
+        paymentService.processTip(customer, order.getDeliveryExecutive(), amount);
+        return true;
+    }
+
+    @Override
+    public DeliveryExecutiveDto rateDeliveryExecutive(Long customerId, Long orderId, Integer rating) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        Order order = orderService.getOrderById(orderId);
+        if(!order.getCustomer().equals(customer)) {
+            throw new RuntimeConflictException("The customer cannot rate as the " +
+                    "order doesn't belong to customer with id: "+customer.getId());
+        }
+        if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.DELIVERED)) {
+            throw new RuntimeConflictException("Order has not been delivered yet"+
+                    ", so cannot start rating, status: "+order.getOrderDeliveryStatus());
+        }
+        return ratingService.rateDeliveryExecutive(order, rating);
+    }
+
+    @Override
+    public RestaurantDto rateRestaurant(Long customerId, Long orderId, Integer rating) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        Order order = orderService.getOrderById(orderId);
+        if(!order.getCustomer().equals(customer)) {
+            throw new RuntimeConflictException("The customer cannot rate as the " +
+                    "order doesn't belong to customer with id: "+customer.getId());
+        }
+        if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.DELIVERED)) {
+            throw new RuntimeConflictException("Order has not been delivered yet"+
+                    ", so cannot start rating, status: "+order.getOrderDeliveryStatus());
+        }
+        return ratingService.rateRestaurant(order, rating);
+    }
+
+    @Override
+    public ReviewDto writeRestaurantReview(Long customerId,ReviewDto reviewDto) {
+        return null;
+    }
+
+    @Override
     public boolean addFundsToWallet(Long customerId, double amount) {
         return false;
-    }
-
-    @Override
-    public OrderStatus getCustomerOrderStatus(Long orderId) {
-        return null;
-    }
-
-    @Override
-    public boolean tipDeliveryExecutive(Long orderId, double amount) {
-        return false;
-    }
-
-    @Override
-    public boolean rateDeliveryExecutive(Long orderId, Integer rating) {
-        return false;
-    }
-
-    @Override
-    public boolean rateRestaurant(Long orderId, Integer rating) {
-        return false;
-    }
-
-    @Override
-    public boolean rateMenuItem(Long menuItemId, Integer rating) {
-        return false;
-    }
-
-    @Override
-    public ReviewDto writeRestaurantReview(ReviewDto reviewDto) {
-        return null;
     }
 
     @Override

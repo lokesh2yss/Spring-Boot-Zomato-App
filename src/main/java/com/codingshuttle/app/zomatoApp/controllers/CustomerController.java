@@ -56,6 +56,32 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.cancelOrder(customerId, orderId));
     }
 
+    @GetMapping(path = "/{customerId}/orders/{orderId}/getDeliveryStatus")
+    public ResponseEntity<OrderStatusDto> getOrderStatus(@PathVariable Long customerId,
+                                                         @PathVariable Long orderId) {
+        return ResponseEntity.ok(customerService.getCustomerOrderStatus(customerId, orderId));
+    }
+
+    @PostMapping(path = "/{customerId}/orders/{orderId}/tipDeliveryExecutive")
+    public ResponseEntity<Boolean> tipDeliveryExecutive(@PathVariable Long customerId,
+                                                         @PathVariable Long orderId,
+                                                               @RequestBody TipDto tipDto) {
+        return ResponseEntity.ok(customerService.tipDeliveryExecutive(customerId, orderId, tipDto.getTipAmount()));
+    }
+
+    @PostMapping(path = "/{customerId}/orders/{orderId}/rateDeliveryExecutive")
+    public ResponseEntity<DeliveryExecutiveDto> rateDeliveryExecutive(@PathVariable Long customerId,
+                                                        @PathVariable Long orderId,
+                                                        @RequestBody RatingDto ratingDto) {
+        return ResponseEntity.ok(customerService.rateDeliveryExecutive(customerId, orderId, ratingDto.getRating()));
+    }
+
+    @PostMapping(path = "/{customerId}/orders/{orderId}/rateRestaurant")
+    public ResponseEntity<RestaurantDto> rateRestaurant(@PathVariable Long customerId,
+                                                                     @PathVariable Long orderId,
+                                                                     @RequestBody RatingDto ratingDto) {
+        return ResponseEntity.ok(customerService.rateRestaurant(customerId, orderId, ratingDto.getRating()));
+    }
     @PostMapping("/{customerId}/addresses")
     public ResponseEntity<AddressDto> addAddress(
             @PathVariable("customerId") Long customerId,

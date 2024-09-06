@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RatingDto {
-    private Long orderId;
-    private Integer rating;
+public class TipDto {
+    private BigDecimal tipAmount;
 }
