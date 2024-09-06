@@ -4,7 +4,6 @@ import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
-import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -36,8 +35,6 @@ public interface CustomerService {
 
 
     OrderStatus getCustomerOrderStatus(Long  orderId);
-
-    Point getDeliveryExecutiveLiveLocation(Long orderId);
 
     boolean tipDeliveryExecutive(Long orderId, double amount);
 

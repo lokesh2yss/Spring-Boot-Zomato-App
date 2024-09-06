@@ -5,9 +5,11 @@ import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.Order;
 import com.codingshuttle.app.zomatoApp.entities.OrderRequest;
 import com.codingshuttle.app.zomatoApp.entities.User;
+import com.codingshuttle.app.zomatoApp.entities.enums.OrderDeliveryStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderRequestStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
+import com.codingshuttle.app.zomatoApp.exceptions.RuntimeConflictException;
 import com.codingshuttle.app.zomatoApp.repositories.CustomerRepository;
 import com.codingshuttle.app.zomatoApp.services.AddressService;
 import com.codingshuttle.app.zomatoApp.services.CustomerService;
@@ -16,7 +18,6 @@ import com.codingshuttle.app.zomatoApp.services.OrderService;
 import com.codingshuttle.app.zomatoApp.strategies.DeliveryExecutiveStrategyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.locationtech.jts.geom.Point;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +49,11 @@ public class CustomerServiceImpl implements CustomerService {
     public OrderDto placeOrder(Long customerId, ConfirmOrderDto confirmOrderDto) {
         Customer customer = getCurrentCustomer();
         OrderRequest orderRequest = orderRequestService.findOrderRequestByCustomerAndRequestStatus(customer, OrderRequestStatus.PENDING);
+
+        if(!orderRequest.getCustomer().equals(customer)) {
+            throw new RuntimeConflictException("Order cannot be created as the orderRequest is not owned by the customer with id: "+customer.getId());
+        }
+
         Order savedOrder = orderService.createNewOrder(orderRequest, confirmOrderDto.getPaymentMethod(), confirmOrderDto.getAddressId());
 
         deliveryExecutiveStrategyManager.deliveryExecutiveMatchingStrategy(customer.getRating()).findMatchingDeliveryExecutives(savedOrder);
@@ -56,7 +62,22 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public OrderDto cancelOrder(Long orderId) {
-        return null;
+        Order order = orderService.getOrderById(orderId);
+
+        Customer customer = getCurrentCustomer();
+        if(!order.getCustomer().equals(customer)) {
+            throw new RuntimeConflictException("Order cannot be cancelled as the order is not owned by the customer with id: "+customer.getId());
+        }
+
+        if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.NOT_ASSIGNED)) {
+            throw new RuntimeConflictException("Order cannot be cancelled as delivery executive already assigned to this order with id: "+orderId);
+        }
+
+        order.setOrderStatus(OrderStatus.CANCELLED);
+
+        Order updatedOrder = orderService.updateOrder(order);
+
+        return modelMapper.map(updatedOrder, OrderDto.class);
     }
 
     @Override
@@ -112,11 +133,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public OrderStatus getCustomerOrderStatus(Long orderId) {
-        return null;
-    }
-
-    @Override
-    public Point getDeliveryExecutiveLiveLocation(Long orderId) {
         return null;
     }
 

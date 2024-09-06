@@ -1,12 +1,12 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.dto.*;
-import com.codingshuttle.app.zomatoApp.entities.Customer;
-import com.codingshuttle.app.zomatoApp.entities.MenuItem;
-import com.codingshuttle.app.zomatoApp.entities.Restaurant;
-import com.codingshuttle.app.zomatoApp.entities.User;
+import com.codingshuttle.app.zomatoApp.entities.*;
 import com.codingshuttle.app.zomatoApp.entities.enums.AccountStatus;
+import com.codingshuttle.app.zomatoApp.entities.enums.OrderDeliveryStatus;
+import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
+import com.codingshuttle.app.zomatoApp.exceptions.RuntimeConflictException;
 import com.codingshuttle.app.zomatoApp.repositories.RestaurantRepository;
 import com.codingshuttle.app.zomatoApp.repositories.UserRepository;
 import com.codingshuttle.app.zomatoApp.services.*;
@@ -87,23 +87,22 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .collect(Collectors.toList());
     }
     @Override
-    public boolean cancelOrder(Long orderId) {
-        return false;
-    }
+    public OrderDto cancelOrder(Long orderId) {
+        Order order = orderService.getOrderById(orderId);
 
-    @Override
-    public boolean acceptOrderCancellation(Long orderId) {
-        return false;
-    }
+        Restaurant restaurant = getCurrentRestaurant();
+        if(!order.getRestaurant().equals(restaurant)) {
+            throw new RuntimeConflictException("Order cannot be cancelled as the order is not owned by the restaurant with id: "+restaurant.getId());
+        }
 
-    @Override
-    public boolean rejectOrderCancellation(Long orderId) {
-        return false;
-    }
+        if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.NOT_ASSIGNED)) {
+            throw new RuntimeConflictException("Order cannot be cancelled as delivery executive already assigned to this order with id: "+orderId);
+        }
 
-    @Override
-    public PointDto getDeliveryExecutiveLiveLocation(Long orderId) {
-        return deliveryExecutiveService.getDeliveryExecutiveLiveLocation(orderId);
+        order.setOrderStatus(OrderStatus.CANCELLED);
+        Order updatedOrder = orderService.updateOrder(order);
+
+        return modelMapper.map(updatedOrder, OrderDto.class);
     }
 
     @Override

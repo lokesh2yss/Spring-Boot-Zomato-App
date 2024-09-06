@@ -1,6 +1,9 @@
 package com.codingshuttle.app.zomatoApp.services;
 
-import com.codingshuttle.app.zomatoApp.dto.*;
+import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.MenuItemDto;
+import com.codingshuttle.app.zomatoApp.dto.OrderDto;
+import com.codingshuttle.app.zomatoApp.dto.RestaurantDto;
 import com.codingshuttle.app.zomatoApp.entities.Customer;
 import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import org.springframework.data.domain.Page;
@@ -20,13 +23,7 @@ public interface RestaurantService {
 
     List<MenuItemDto> getRestaurantMenu(Long restaurantId);
 
-    boolean cancelOrder(Long orderId);
-
-    boolean acceptOrderCancellation(Long orderId);
-
-    boolean rejectOrderCancellation(Long orderId);
-
-    PointDto getDeliveryExecutiveLiveLocation(Long orderId);
+    OrderDto cancelOrder(Long orderId);
 
     List<RestaurantDto> getNearbyRestaurantsByCustomer(Customer customer);
 

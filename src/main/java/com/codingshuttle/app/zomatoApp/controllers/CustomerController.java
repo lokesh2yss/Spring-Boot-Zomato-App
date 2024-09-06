@@ -27,6 +27,13 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.addOrderItemToOrderRequest(customerId, orderRequestItemDto));
     }
 
+    @PostMapping("/{customerId}/orders/{orderId}/cancel")
+    public ResponseEntity<OrderDto> cancelOrder(
+            @PathVariable("customerId") Long customerId,
+            @PathVariable Long orderId) {
+        return ResponseEntity.ok(customerService.cancelOrder(orderId));
+    }
+
     @PostMapping("/{customerId}/addresses")
     public ResponseEntity<AddressDto> addAddress(
             @PathVariable("customerId") Long customerId,

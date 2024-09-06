@@ -1,11 +1,11 @@
 package com.codingshuttle.app.zomatoApp.services.impl;
 
 import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.LiveLocationResponseDto;
 import com.codingshuttle.app.zomatoApp.dto.OrderDto;
 import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
 import com.codingshuttle.app.zomatoApp.entities.Order;
-import com.codingshuttle.app.zomatoApp.entities.Restaurant;
 import com.codingshuttle.app.zomatoApp.entities.User;
 import com.codingshuttle.app.zomatoApp.entities.enums.AccountStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.OrderDeliveryStatus;
@@ -23,7 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
 
 @Service
@@ -98,14 +97,18 @@ public class DeliveryExecutiveServiceImpl implements DeliveryExecutiveService {
     }
 
     @Override
-    public PointDto getDeliveryExecutiveLiveLocation(Long orderId) {
-        Order order = orderService.getOrderById(orderId);
-
+    public LiveLocationResponseDto getDeliveryExecutiveLiveLocation(Order order) {
         if(!order.getOrderDeliveryStatus().equals(OrderDeliveryStatus.DELIVERED) && !order.getOrderStatus().equals(OrderStatus.CANCELLED)) {
             throw new RuntimeException("Invalid order status, status:"+order.getOrderStatus());
         }
+        PointDto pointDto = modelMapper.map(order.getDeliveryExecutive().getCurrentLocation(), PointDto.class);
 
-        return modelMapper.map(order.getDeliveryExecutive().getCurrentLocation(), PointDto.class);
+        return LiveLocationResponseDto
+                .builder()
+                .liveLocation(pointDto)
+                .orderId(order.getId())
+                .deliveryExecutiveId(order.getDeliveryExecutive().getId())
+                .build();
     }
 
     @Override

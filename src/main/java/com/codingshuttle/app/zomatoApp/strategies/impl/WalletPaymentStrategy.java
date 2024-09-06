@@ -5,7 +5,6 @@ import com.codingshuttle.app.zomatoApp.entities.Payment;
 import com.codingshuttle.app.zomatoApp.entities.enums.PaymentStatus;
 import com.codingshuttle.app.zomatoApp.entities.enums.TransactionMethod;
 import com.codingshuttle.app.zomatoApp.repositories.PaymentRepository;
-import com.codingshuttle.app.zomatoApp.services.PaymentService;
 import com.codingshuttle.app.zomatoApp.services.WalletService;
 import com.codingshuttle.app.zomatoApp.strategies.PaymentStrategy;
 import lombok.RequiredArgsConstructor;

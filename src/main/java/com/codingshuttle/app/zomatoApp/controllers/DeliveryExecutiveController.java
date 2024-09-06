@@ -1,8 +1,12 @@
 package com.codingshuttle.app.zomatoApp.controllers;
 
-import com.codingshuttle.app.zomatoApp.dto.*;
+import com.codingshuttle.app.zomatoApp.dto.AddressDto;
+import com.codingshuttle.app.zomatoApp.dto.OrderCompleteDto;
+import com.codingshuttle.app.zomatoApp.dto.OrderDto;
+import com.codingshuttle.app.zomatoApp.dto.OrderPickupDto;
 import com.codingshuttle.app.zomatoApp.services.DeliveryExecutiveService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,45 +37,39 @@ public class DeliveryExecutiveController {
         return ResponseEntity.ok(deliveryExecutiveService.completeOrderDelivery(orderId, orderCompleteDto.getDeliveryOtp()));
     }
 
-    @GetMapping(path = "/{deliveryExecutiveId}/orders/{orderId}/getLiveLocation")
-    public ResponseEntity<PointDto> getDeliveryExecutiveLiveLocation(@PathVariable Long deliveryExecutiveId,
-                                                                     @PathVariable Long orderId) {
-        return ResponseEntity.ok(deliveryExecutiveService.getDeliveryExecutiveLiveLocation(orderId));
-    }
-
     @PostMapping("/{deliveryExecutiveId}/addresses")
-    public AddressDto addAddress(
+    public ResponseEntity<AddressDto> addAddress(
             @PathVariable("deliveryExecutiveId") Long deliveryExecutiveId,
             @RequestBody AddressDto addressDto) {
-        return deliveryExecutiveService.addDeliveryExecutiveAddress(deliveryExecutiveId, addressDto);
+        return new ResponseEntity<>(deliveryExecutiveService.addDeliveryExecutiveAddress(deliveryExecutiveId, addressDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/{deliveryExecutiveId}/default-address")
-    public AddressDto getDeliveryExecutiveDefaultAddress(
+    public ResponseEntity<AddressDto> getDeliveryExecutiveDefaultAddress(
             @PathVariable("deliveryExecutiveId") Long deliveryExecutiveId) {
-        return deliveryExecutiveService.getDeliveryExecutiveDefaultAddress(deliveryExecutiveId);
+        return ResponseEntity.ok(deliveryExecutiveService.getDeliveryExecutiveDefaultAddress(deliveryExecutiveId));
     }
 
     @PostMapping("/{deliveryExecutiveId}/default-address/{addressId}")
-    public AddressDto setDefaultAddress(
+    public ResponseEntity<AddressDto> setDefaultAddress(
             @PathVariable("deliveryExecutiveId") Long deliveryExecutiveId,
             @PathVariable("addressId") Long addressId) {
-        return deliveryExecutiveService.setDeliveryExecutiveDefaultAddress(deliveryExecutiveId, addressId);
+        return new ResponseEntity<>(deliveryExecutiveService.setDeliveryExecutiveDefaultAddress(deliveryExecutiveId, addressId), HttpStatus.CREATED);
     }
 
     @PutMapping("/{deliveryExecutiveId}/addresses/{addressId}")
-    public AddressDto updateAddress(
+    public ResponseEntity<AddressDto> updateAddress(
             @PathVariable("deliveryExecutiveId") Long deliveryExecutiveId,
             @PathVariable("addressId") Long addressId,
             @RequestBody AddressDto addressDto) {
-        return deliveryExecutiveService.updateDeliveryExecutiveAddress(deliveryExecutiveId, addressId, addressDto);
+        return ResponseEntity.ok(deliveryExecutiveService.updateDeliveryExecutiveAddress(deliveryExecutiveId, addressId, addressDto));
     }
 
     @DeleteMapping("/{deliveryExecutiveId}/addresses/{addressId}")
-    public boolean deleteAddress(
+    public ResponseEntity<Boolean> deleteAddress(
             @PathVariable("deliveryExecutiveId") Long deliveryExecutiveId,
             @PathVariable("addressId") Long addressId) {
-        return deliveryExecutiveService.deleteDeliveryExecutiveAddress(deliveryExecutiveId, addressId);
+        return ResponseEntity.ok(deliveryExecutiveService.deleteDeliveryExecutiveAddress(deliveryExecutiveId, addressId));
     }
 }
 

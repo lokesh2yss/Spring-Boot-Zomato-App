@@ -1,9 +1,8 @@
 package com.codingshuttle.app.zomatoApp.services;
 
 import com.codingshuttle.app.zomatoApp.dto.AddressDto;
-import com.codingshuttle.app.zomatoApp.dto.DeliveryExecutiveDto;
+import com.codingshuttle.app.zomatoApp.dto.LiveLocationResponseDto;
 import com.codingshuttle.app.zomatoApp.dto.OrderDto;
-import com.codingshuttle.app.zomatoApp.dto.PointDto;
 import com.codingshuttle.app.zomatoApp.entities.DeliveryExecutive;
 import com.codingshuttle.app.zomatoApp.entities.Order;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,7 @@ public interface DeliveryExecutiveService {
     OrderDto pickupOrderForDelivery(Long orderId, String pickupOtp);
 
     OrderDto completeOrderDelivery(Long orderId, String deliveryOtp);
-    PointDto getDeliveryExecutiveLiveLocation(Long orderId);
+    LiveLocationResponseDto getDeliveryExecutiveLiveLocation(Order order);
     AddressDto addDeliveryExecutiveAddress(Long deliveryExecutiveId, AddressDto addressDto);
 
     AddressDto updateDeliveryExecutiveAddress(Long deliveryExecutiveId, Long addressId, AddressDto addressDto);
