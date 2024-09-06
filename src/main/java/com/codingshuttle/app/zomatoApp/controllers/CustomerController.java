@@ -82,6 +82,14 @@ public class CustomerController {
                                                                      @RequestBody RatingDto ratingDto) {
         return ResponseEntity.ok(customerService.rateRestaurant(customerId, orderId, ratingDto.getRating()));
     }
+
+    @PostMapping(path = "/{customerId}/orders")
+    public ResponseEntity<Page<OrderDto>> getAllMyOrders(@PathVariable Long customerId,
+                                                        @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+                                                        @RequestParam(defaultValue = "10", required = false) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+        return ResponseEntity.ok(customerService.getAllMyOrders(pageRequest));
+    }
     @PostMapping("/{customerId}/addresses")
     public ResponseEntity<AddressDto> addAddress(
             @PathVariable("customerId") Long customerId,
