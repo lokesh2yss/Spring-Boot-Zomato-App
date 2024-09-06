@@ -13,6 +13,11 @@ public interface OrderService {
 
     Order updateOrderStatus(Order order, OrderStatus orderStatus);
 
+    Page<Order> getAllCurrentOrdersOfCustomer(Customer customer, PageRequest pageRequest);
+
+    Page<Order> getAllCurrentOrdersOfRestaurant(Restaurant restaurant, PageRequest pageRequest);
+
+
     Page<Order> getAllOrdersOfCustomer(Customer customer, PageRequest pageRequest);
 
     Page<Order> getAllOrdersOfRestaurant(Restaurant restaurant, PageRequest pageRequest);

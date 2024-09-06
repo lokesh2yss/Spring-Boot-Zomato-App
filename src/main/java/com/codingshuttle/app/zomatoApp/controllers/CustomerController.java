@@ -3,9 +3,14 @@ package com.codingshuttle.app.zomatoApp.controllers;
 import com.codingshuttle.app.zomatoApp.dto.*;
 import com.codingshuttle.app.zomatoApp.services.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/customers")
@@ -13,25 +18,42 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @PostMapping(path = "/{customerId}/orders/")
-    public ResponseEntity<OrderDto> placeOrder(@PathVariable Long customerId, @RequestBody ConfirmOrderDto confirmOrderDto) {
-        return ResponseEntity.ok(customerService.placeOrder(customerId, confirmOrderDto));
+    @GetMapping(path = "/{customerId}")
+    public ResponseEntity<CustomerDto> getCustomerById(@PathVariable Long customerId) {
+        return ResponseEntity.ok(customerService.getCustomerById(customerId));
     }
-    @DeleteMapping(path = "/{customerId}/order-requests/{menuItemId}")
-    public ResponseEntity<OrderRequestDto> deleteOrderItemFromOrderRequest(@PathVariable Long customerId, @PathVariable Long menuItemId) {
-        return ResponseEntity.ok(customerService.deleteOrderItemFromOrderRequest(customerId, menuItemId));
+
+    @GetMapping(path = "/{customerId}/orders/current")
+    public ResponseEntity<Page<OrderDto>> getAllCurrentOrdersOfCustomer(@PathVariable Long customerId,
+                                                                           @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+                                                                           @RequestParam(defaultValue = "10", required = false) Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "id"));
+        return ResponseEntity.ok(customerService.getCustomersAllCurrentOrders(customerId, pageRequest));
+    }
+    @GetMapping(path = "/{customerId}/restaurants/nearby")
+    public ResponseEntity<List<RestaurantDto>> getNearbyRestaurants(@PathVariable Long customerId) {
+        return ResponseEntity.ok(customerService.getNearbyRestaurants(customerId));
     }
 
     @PostMapping(path = "/{customerId}/order-requests")
     public ResponseEntity<OrderRequestDto> addOrderItemToOrderRequest(@PathVariable Long customerId, @RequestBody OrderRequestItemDto orderRequestItemDto) {
         return ResponseEntity.ok(customerService.addOrderItemToOrderRequest(customerId, orderRequestItemDto));
     }
+    @DeleteMapping(path = "/{customerId}/order-requests/{menuItemId}")
+    public ResponseEntity<OrderRequestDto> deleteOrderItemFromOrderRequest(@PathVariable Long customerId, @PathVariable Long menuItemId) {
+        return ResponseEntity.ok(customerService.deleteOrderItemFromOrderRequest(customerId, menuItemId));
+    }
+
+    @PostMapping(path = "/{customerId}/orders/")
+    public ResponseEntity<OrderDto> placeOrder(@PathVariable Long customerId, @RequestBody ConfirmOrderDto confirmOrderDto) {
+        return ResponseEntity.ok(customerService.placeOrder(customerId, confirmOrderDto));
+    }
 
     @PostMapping("/{customerId}/orders/{orderId}/cancel")
     public ResponseEntity<OrderDto> cancelOrder(
             @PathVariable("customerId") Long customerId,
             @PathVariable Long orderId) {
-        return ResponseEntity.ok(customerService.cancelOrder(orderId));
+        return ResponseEntity.ok(customerService.cancelOrder(customerId, orderId));
     }
 
     @PostMapping("/{customerId}/addresses")

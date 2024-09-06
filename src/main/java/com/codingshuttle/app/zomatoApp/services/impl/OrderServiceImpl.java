@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -64,6 +65,17 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(orderStatus);
         return orderRepository.save(order);
     }
+
+    @Override
+    public Page<Order> getAllCurrentOrdersOfCustomer(Customer customer, PageRequest pageRequest) {
+        return orderRepository.findByCustomerAndOrderStatusNotInAndOrderDeliveryStatusNotIn(customer, List.of(OrderStatus.CANCELLED), List.of(OrderDeliveryStatus.DELIVERED), pageRequest);
+    }
+
+    @Override
+    public Page<Order> getAllCurrentOrdersOfRestaurant(Restaurant restaurant, PageRequest pageRequest) {
+        return null;
+    }
+
     @Override
     public Page<Order> getAllOrdersOfCustomer(Customer customer, PageRequest pageRequest) {
         return orderRepository.findByCustomer(customer, pageRequest);

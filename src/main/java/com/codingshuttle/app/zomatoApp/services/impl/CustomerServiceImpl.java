@@ -11,10 +11,7 @@ import com.codingshuttle.app.zomatoApp.entities.enums.OrderStatus;
 import com.codingshuttle.app.zomatoApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.app.zomatoApp.exceptions.RuntimeConflictException;
 import com.codingshuttle.app.zomatoApp.repositories.CustomerRepository;
-import com.codingshuttle.app.zomatoApp.services.AddressService;
-import com.codingshuttle.app.zomatoApp.services.CustomerService;
-import com.codingshuttle.app.zomatoApp.services.OrderRequestService;
-import com.codingshuttle.app.zomatoApp.services.OrderService;
+import com.codingshuttle.app.zomatoApp.services.*;
 import com.codingshuttle.app.zomatoApp.strategies.DeliveryExecutiveStrategyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,17 +34,45 @@ public class CustomerServiceImpl implements CustomerService {
     private final OrderRequestService orderRequestService;
     private final OrderService orderService;
     private final DeliveryExecutiveStrategyManager deliveryExecutiveStrategyManager;
+    private final RestaurantService restaurantService;
 
     @Override
-    public Customer getCustomerById(Long customerId) {
-        return customerRepository.findById(customerId).orElseThrow(
+    public CustomerDto getCustomerById(Long customerId) {
+        Customer customer = customerRepository.findById(customerId).orElseThrow(
                 () -> new ResourceNotFoundException("Customer not found with id"+customerId)
         );
+
+        return modelMapper.map(customer, CustomerDto.class);
+    }
+
+    @Override
+    public List<RestaurantDto> getNearbyRestaurants(Long customerId) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        return restaurantService.getNearbyRestaurantsByCustomer(customer);
+    }
+
+
+    @Override
+    public OrderRequestDto addOrderItemToOrderRequest(Long customerId, OrderRequestItemDto orderRequestItemDto) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        log.info("Retrieved currentCustomer in addOrderItemToOrderRequest {}", customer);
+        return orderRequestService.addMenuItemToOrderRequest(customer, orderRequestItemDto.getMenuItemId(), orderRequestItemDto.getQuantity());
+    }
+
+    @Override
+    public OrderRequestDto deleteOrderItemFromOrderRequest(Long customerId, Long menuItemId) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        log.info("Retrieved currentCustomer in addOrderItemToOrderRequest {}", customer);
+        return orderRequestService.deleteMenuItemFromOrderRequest(customer, menuItemId);
     }
 
     @Override
     public OrderDto placeOrder(Long customerId, ConfirmOrderDto confirmOrderDto) {
         Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
         OrderRequest orderRequest = orderRequestService.findOrderRequestByCustomerAndRequestStatus(customer, OrderRequestStatus.PENDING);
 
         if(!orderRequest.getCustomer().equals(customer)) {
@@ -61,10 +86,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public OrderDto cancelOrder(Long orderId) {
+    public OrderDto cancelOrder(Long customerId, Long orderId) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
         Order order = orderService.getOrderById(orderId);
 
-        Customer customer = getCurrentCustomer();
         if(!order.getCustomer().equals(customer)) {
             throw new RuntimeConflictException("Order cannot be cancelled as the order is not owned by the customer with id: "+customer.getId());
         }
@@ -79,51 +105,12 @@ public class CustomerServiceImpl implements CustomerService {
 
         return modelMapper.map(updatedOrder, OrderDto.class);
     }
-
     @Override
-    public AddressDto addCustomerAddress(Long customerId, AddressDto addressDto) {
-        User user = getUserByCustomerId(customerId);
-        return addressService.addAddressForUser(user.getId(), addressDto);
-    }
-
-    @Override
-    public AddressDto updateCustomerAddress(Long customerId, Long addressId, AddressDto addressDto) {
-        User user = getUserByCustomerId(customerId);
-        return addressService.updateAddressForUser(user.getId(), addressId, addressDto);
-    }
-
-    @Override
-    public boolean deleteCustomerAddress(Long customerId, Long addressId) {
-        User user = getUserByCustomerId(customerId);
-        return addressService.deleteAddressForUser(user.getId(), addressId);
-    }
-
-    @Override
-    public AddressDto getCustomerDefaultAddress(Long customerId) {
-        User user = getUserByCustomerId(customerId);
-        return modelMapper.map(user.getDefaultAddress(), AddressDto.class);
-    }
-
-    @Override
-    public AddressDto setCustomerDefaultAddress(Long customerId, Long addressId) {
-        User user = getUserByCustomerId(customerId);
-        return addressService.setDefaultAddressForUser(user.getId(), addressId);
-    }
-    private User getUserByCustomerId(Long customerId) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id="+customerId));
-
-        return customer.getUser();
-    }
-
-    @Override
-    public List<OrderDto> getCustomersAllCurrentOrders(Long customerId) {
-        return null;
-    }
-
-    @Override
-    public List<OrderDto> getCustomerOrderHistory(Long customerId) {
-        return null;
+    public Page<OrderDto> getCustomersAllCurrentOrders(Long customerId, PageRequest pageRequest) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        return orderService.getAllCurrentOrdersOfCustomer(customer, pageRequest)
+                .map((element) -> modelMapper.map(element, OrderDto.class));
     }
 
     @Override
@@ -162,6 +149,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Page<OrderDto> getAllMyOrders(PageRequest pageRequest) {
+        Customer customer = getCurrentCustomer();
+        return orderService.getAllOrdersOfCustomer(customer, pageRequest)
+                .map((element) -> modelMapper.map(element, OrderDto.class));
+    }
+
+    @Override
     public void createNewCustomer(User user) {
         Customer toSaveCustomer = Customer.builder()
                         .user(user)
@@ -172,30 +166,60 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public OrderRequestDto addOrderItemToOrderRequest(Long customerId, OrderRequestItemDto orderRequestItemDto) {
+    public AddressDto addCustomerAddress(Long customerId, AddressDto addressDto) {
         Customer customer = getCurrentCustomer();
-        log.info("Retrieved currentCustomer in addOrderItemToOrderRequest {}", customer);
-        return orderRequestService.addMenuItemToOrderRequest(customer, orderRequestItemDto.getMenuItemId(), orderRequestItemDto.getQuantity());
+        validateCustomer(customer, customerId);
+        User user = customer.getUser();
+        return addressService.addAddressForUser(user.getId(), addressDto);
     }
 
     @Override
-    public OrderRequestDto deleteOrderItemFromOrderRequest(Long customerId, Long menuItemId) {
+    public AddressDto updateCustomerAddress(Long customerId, Long addressId, AddressDto addressDto) {
         Customer customer = getCurrentCustomer();
-        log.info("Retrieved currentCustomer in addOrderItemToOrderRequest {}", customer);
-        return orderRequestService.deleteMenuItemFromOrderRequest(customer, menuItemId);
+        validateCustomer(customer, customerId);
+        User user = customer.getUser();
+        return addressService.updateAddressForUser(user.getId(), addressId, addressDto);
     }
 
     @Override
-    public Page<OrderDto> getAllMyOrders(PageRequest pageRequest) {
+    public boolean deleteCustomerAddress(Long customerId, Long addressId) {
         Customer customer = getCurrentCustomer();
-        return orderService.getAllOrdersOfCustomer(customer, pageRequest)
-                .map((element) -> modelMapper.map(element, OrderDto.class));
+        validateCustomer(customer, customerId);
+        User user = customer.getUser();
+        return addressService.deleteAddressForUser(user.getId(), addressId);
     }
 
+    @Override
+    public AddressDto getCustomerDefaultAddress(Long customerId) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        User user = customer.getUser();
+        return modelMapper.map(user.getDefaultAddress(), AddressDto.class);
+    }
+
+    @Override
+    public AddressDto setCustomerDefaultAddress(Long customerId, Long addressId) {
+        Customer customer = getCurrentCustomer();
+        validateCustomer(customer, customerId);
+        User user = customer.getUser();
+        return addressService.setDefaultAddressForUser(user.getId(), addressId);
+    }
+
+    private void validateCustomer(Customer customer, Long customerId) {
+        if(!customer.getId().equals(customerId)) {
+            throw new RuntimeConflictException("Customer not logged in with id:  "+customerId);
+        }
+    }
     private Customer getCurrentCustomer() {
         User user =  (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return customerRepository.findByUser(user).orElseThrow(() ->
                 new ResolutionException("Customer not associated with user with id "+user.getId()));
 
+    }
+    private User getUserByCustomerId(Long customerId) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id="+customerId));
+
+        return customer.getUser();
     }
 }
