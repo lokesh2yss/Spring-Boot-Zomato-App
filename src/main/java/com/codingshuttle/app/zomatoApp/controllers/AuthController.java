@@ -6,6 +6,7 @@ import com.codingshuttle.app.zomatoApp.services.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import java.util.Arrays;
 public class AuthController {
     private final AuthService authService;
     @PostMapping(path = "/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginDto loginDto, HttpServletResponse response) {
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         String[] tokens = authService.login(loginDto.getEmail(), loginDto.getPassword());
         Cookie cookie = new Cookie("token", tokens[1]);
         cookie.setHttpOnly(true);
