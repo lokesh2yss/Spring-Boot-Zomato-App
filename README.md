@@ -1,28 +1,44 @@
 ---
 
-# Zomato Backend Clone – Spring Boot
+# Zomato Backend System – Spring Boot
 
-A backend system that simulates the core functionality of an online food ordering platform similar to **Zomato**.
+Java | Spring Boot | PostgreSQL | JWT | System Design
 
-The system allows customers to browse restaurants, place food orders, track deliveries, make payments, and rate restaurants and delivery executives.
+A backend system that simulates the core functionality of an online food delivery platform similar to **Zomato**.
 
-This project demonstrates backend system design for a food delivery platform using **Java and Spring Boot**, focusing on domain-driven service architecture, REST API design, and transactional workflows.
+---
+
+# System Design Summary
+
+This project demonstrates the backend architecture of a food delivery platform similar to Zomato.
+
+Key architectural characteristics:
+
+* Backend services implemented using **Spring Boot**
+* Domain-based services for **customers, restaurants, orders, and delivery executives**
+* **JWT-based authentication and role-based authorization**
+* **PostgreSQL database** used for order, restaurant, and user management
+* Complete **order lifecycle management** from order placement to delivery
+
+The system models the complete food ordering workflow including restaurant discovery, order creation, delivery assignment, and payment handling.
 
 ---
 
 # Application Overview
 
-The system supports the complete food ordering workflow including:
+The platform enables customers to discover restaurants, place food orders, and track deliveries.
 
-* browsing nearby restaurants
-* viewing restaurant menus
-* placing orders
-* assigning delivery executives
-* tracking order lifecycle
-* making payments
-* rating restaurants and delivery executives
+Core capabilities include:
 
-The backend is structured around domain services responsible for different parts of the system such as customers, restaurants, orders, and delivery operations.
+* restaurant discovery
+* menu browsing
+* order placement
+* delivery executive assignment
+* order lifecycle management
+* payment handling
+* ratings for restaurants and delivery executives
+
+The backend is organized into domain services responsible for customers, restaurants, orders, delivery operations, and authentication.
 
 ---
 
@@ -32,34 +48,32 @@ The backend is structured around domain services responsible for different parts
 
 * find nearby restaurants
 * view restaurant menus
-* add items to order request
+* create order requests
 * place orders
 * cancel orders
 * track order status
 * rate restaurants
 * rate delivery executives
-* add and manage addresses
+* manage delivery addresses
 * add funds to wallet
 
 ---
 
 ### Restaurant
 
-* add menu items
-* update menu items
-* delete menu items
-* accept or reject order cancellations
-* view orders
+* manage menu items
+* view incoming orders
+* accept or reject cancellations
 
 ---
 
 ### Delivery Executive
 
-* accept delivery orders
+* accept delivery assignments
 * confirm order pickup
 * confirm order delivery
-* update live location
-* withdraw wallet funds
+* update delivery status
+* withdraw wallet balance
 * rate customers
 
 ---
@@ -71,8 +85,6 @@ The backend is structured around domain services responsible for different parts
 * ban restaurants
 * ban delivery executives
 * view system orders
-* view all restaurants
-* view delivery executives
 
 ---
 
@@ -86,21 +98,14 @@ The backend is structured around domain services responsible for different parts
 * Spring Security
 * REST APIs
 
----
-
 ### Authentication
 
-* JWT Token Based Authentication
-* Role Based Authorization
-
----
+* JWT Token Authentication
+* Role-based Authorization
 
 ### Database
 
 * PostgreSQL
-* PostGIS extension (for geospatial queries)
-
----
 
 ### Tools
 
@@ -111,54 +116,58 @@ The backend is structured around domain services responsible for different parts
 
 # System Architecture
 
-The backend follows a **service-oriented layered architecture**.
+The backend follows a **layered architecture** with domain services.
 
-Major domain services include:
+```text
+Controller Layer
+        ↓
+Service Layer
+        ↓
+Repository Layer
+        ↓
+PostgreSQL Database
+```
+
+Major domain services:
 
 * **UserService** – authentication and user management
 * **CustomerService** – customer operations
 * **RestaurantService** – restaurant and menu management
-* **OrderRequestService** – temporary order building
+* **OrderRequestService** – temporary order creation
 * **OrderService** – order lifecycle management
 * **DeliveryExecutiveService** – delivery operations
 * **Wallet** – payment handling
 * **Rating** – rating and feedback
 
-Each service encapsulates domain logic related to its entity.
-
 ---
 
 # Architecture Diagram
 
-![System Architecture](zomato-system-architecture.png)
+The following diagram illustrates the service interactions during the food ordering workflow.
+
+![Zomato Architecture](zomato-system-architecture.png)
 
 ---
 
 # Food Ordering Workflow
 
-The process of ordering food follows these steps.
-
----
-
 ### Step 1 — Customer discovers restaurants
 
-Customer searches for nearby restaurants.
+Customers search for nearby restaurants.
 
-Customer endpoint:
-
-```
+```text
 GET /restaurants/nearby
 ```
 
-CustomerService queries restaurants based on location.
+RestaurantService retrieves available restaurants.
 
 ---
 
-### Step 2 — Customer views menu
+### Step 2 — Customer views restaurant menu
 
-Customer retrieves the menu of a restaurant.
+Customers view menu items of a selected restaurant.
 
-```
+```text
 GET /restaurants/{restaurantId}/menu
 ```
 
@@ -168,9 +177,9 @@ RestaurantService returns menu items.
 
 ### Step 3 — Customer builds order request
 
-Customer creates an order request by adding menu items.
+Customers add or remove menu items to create an order request.
 
-```
+```text
 POST /orderRequest/addMenuItem
 DELETE /orderRequest/removeMenuItem
 ```
@@ -181,50 +190,50 @@ OrderRequestService maintains the temporary order.
 
 ### Step 4 — Customer places order
 
-```
+```text
 POST /orders/placeOrder
 ```
 
-The system:
+The system performs:
 
-1. validates the order
-2. calculates total price
-3. processes payment
-4. creates the order
+* order validation
+* price calculation
+* payment processing
+* order creation
 
 ---
 
 ### Step 5 — Assign delivery executive
 
-OrderService finds available delivery executives.
+OrderService assigns an available delivery executive.
 
-```
-findDeliveryExecutives()
+```text
+findDeliveryExecutive()
 ```
 
-The order is assigned to a delivery executive.
+The order is then assigned for delivery.
 
 ---
 
 ### Step 6 — Delivery lifecycle
 
-Delivery executive performs:
+Delivery executive performs the following operations:
 
-```
+```text
 acceptOrderDelivery
 confirmOrderPickup
 confirmOrderDelivery
 ```
 
-The order status changes accordingly.
+The order status is updated accordingly.
 
 ---
 
 # Order Lifecycle
 
-Orders progress through the following states.
+Orders progress through the following states:
 
-```
+```text
 CREATED
 ACCEPTED
 PREPARING
@@ -235,66 +244,29 @@ CANCELLED
 
 ---
 
-# Wallet and Payment
-
-Customers maintain a wallet used for payments.
-
-Wallet features:
-
-* add funds
-* debit funds during order placement
-* refund during cancellations
-
-Payment service processes transactions when placing orders.
-
----
-
-# Address Management
-
-Customers can manage multiple delivery addresses.
-
-Operations include:
-
-* add address
-* update address
-* delete address
-* set default address
-
----
-
-# Ratings System
-
-Customers can rate:
-
-* restaurants
-* delivery executives
-
-Delivery executives can rate customers.
-
-Ratings help maintain service quality across the platform.
-
----
-
 # Authentication & Authorization
 
-The system uses **JWT based authentication**.
+The system uses **JWT-based authentication**.
 
 Authentication endpoints:
 
-```
+```text
 POST /signup
 POST /login
 ```
 
-After login, the server returns a **JWT token**.
+After login:
 
-All protected APIs require:
+* server issues a **JWT token**
+* token must be included in request headers
 
-```
+Example:
+
+```text
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-Role-based access control ensures that:
+Role-based access control ensures:
 
 * customers access customer APIs
 * restaurants access restaurant APIs
@@ -307,7 +279,7 @@ Role-based access control ensures that:
 
 Main domain entities:
 
-```
+```text
 User
 Customer
 Restaurant
@@ -320,36 +292,57 @@ Address
 Rating
 ```
 
+Relationships:
+
+```text
+Customer → Order
+Restaurant → MenuItem
+Order → DeliveryExecutive
+Customer → Address
+```
+
+---
+
+# Design Patterns Used
+
+The system uses several object-oriented design patterns:
+
+* Builder Pattern
+* Factory Pattern
+* Singleton Pattern
+
+These patterns help maintain clean architecture and modular service design.
+
 ---
 
 # Additional Components
 
-The project also includes:
+Other infrastructure features include:
 
 * Swagger API documentation
 * GlobalExceptionHandler
 * GlobalResponseHandler
-* environment profiles (DEV, PROD)
+* DEV and PROD profiles
 
 ---
 
 # Running the Project
 
-Clone the repository:
+Clone the repository
 
-```
+```text
 git clone https://github.com/lokesh2yss/Spring-Boot-Zomato-App
 ```
 
-Navigate to the project directory:
+Navigate to the project directory
 
-```
+```text
 cd Spring-Boot-Zomato-App
 ```
 
-Run the application:
+Run the application
 
-```
+```text
 mvn spring-boot:run
 ```
 
@@ -359,13 +352,13 @@ Ensure PostgreSQL is running and configured in `application.properties`.
 
 # Future Improvements
 
-Potential improvements include:
+Possible enhancements:
 
-* Redis caching for restaurant queries
+* Redis caching for restaurant search
 * Kafka event-driven architecture
 * real-time delivery tracking
-* microservices architecture
-* Docker containerization
+* microservice architecture
+* Docker deployment
 * distributed order assignment
 
 ---
@@ -373,7 +366,6 @@ Potential improvements include:
 # Author
 
 Lokesh Kumar
-
 Senior Backend Engineer
 Java | Spring Boot | Distributed Systems
 
