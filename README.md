@@ -2,7 +2,7 @@
 
 # Zomato Backend System – Spring Boot
 
-Java | Spring Boot | PostgreSQL | JWT | System Design
+Java | Spring Boot | PostgreSQL | PostGIS | JWT | System Design
 
 A backend system that simulates the core functionality of an online food delivery platform similar to **Zomato**.
 
@@ -17,16 +17,16 @@ Key architectural characteristics:
 * Backend services implemented using **Spring Boot**
 * Domain-based services for **customers, restaurants, orders, and delivery executives**
 * **JWT-based authentication and role-based authorization**
-* **PostgreSQL database** used for order, restaurant, and user management
+* **PostgreSQL database with PostGIS extension** for geospatial queries
 * Complete **order lifecycle management** from order placement to delivery
 
-The system models the complete food ordering workflow including restaurant discovery, order creation, delivery assignment, and payment handling.
+The system models the full food ordering workflow including restaurant discovery, order creation, delivery assignment, and payment handling.
 
 ---
 
 # Application Overview
 
-The platform enables customers to discover restaurants, place food orders, and track deliveries.
+The platform enables customers to discover nearby restaurants, place food orders, and track deliveries.
 
 Core capabilities include:
 
@@ -37,6 +37,7 @@ Core capabilities include:
 * order lifecycle management
 * payment handling
 * ratings for restaurants and delivery executives
+* geospatial queries to find nearby restaurants and delivery executives
 
 The backend is organized into domain services responsible for customers, restaurants, orders, delivery operations, and authentication.
 
@@ -106,6 +107,7 @@ The backend is organized into domain services responsible for customers, restaur
 ### Database
 
 * PostgreSQL
+* **PostGIS extension (for geospatial queries)**
 
 ### Tools
 
@@ -125,7 +127,7 @@ Service Layer
         ↓
 Repository Layer
         ↓
-PostgreSQL Database
+PostgreSQL + PostGIS
 ```
 
 Major domain services:
@@ -151,15 +153,15 @@ The following diagram illustrates the service interactions during the food order
 
 # Food Ordering Workflow
 
-### Step 1 — Customer discovers restaurants
+### Step 1 — Customer discovers nearby restaurants
 
-Customers search for nearby restaurants.
+Customers search for restaurants close to their location.
 
 ```text
 GET /restaurants/nearby
 ```
 
-RestaurantService retrieves available restaurants.
+RestaurantService uses **PostGIS geospatial queries** to find nearby restaurants based on latitude and longitude.
 
 ---
 
@@ -171,7 +173,7 @@ Customers view menu items of a selected restaurant.
 GET /restaurants/{restaurantId}/menu
 ```
 
-RestaurantService returns menu items.
+RestaurantService returns available menu items.
 
 ---
 
@@ -205,10 +207,10 @@ The system performs:
 
 ### Step 5 — Assign delivery executive
 
-OrderService assigns an available delivery executive.
+OrderService finds the nearest available delivery executive using **PostGIS location queries**.
 
 ```text
-findDeliveryExecutive()
+findNearestDeliveryExecutive()
 ```
 
 The order is then assigned for delivery.
@@ -301,6 +303,12 @@ Order → DeliveryExecutive
 Customer → Address
 ```
 
+Geospatial fields stored using **PostGIS** enable efficient queries such as:
+
+* nearest restaurants
+* nearest delivery executives
+* delivery distance calculations
+
 ---
 
 # Design Patterns Used
@@ -311,7 +319,7 @@ The system uses several object-oriented design patterns:
 * Factory Pattern
 * Singleton Pattern
 
-These patterns help maintain clean architecture and modular service design.
+These patterns help maintain modular architecture and clean service design.
 
 ---
 
@@ -373,3 +381,4 @@ LeetCode
 [https://leetcode.com/u/lokeshtalks/](https://leetcode.com/u/lokeshtalks/)
 
 ---
+
