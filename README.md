@@ -130,12 +130,6 @@ Each service encapsulates domain logic related to its entity.
 
 # Architecture Diagram
 
-```
-zomato-system-architecture.png
-```
-
-Then reference it like this:
-
 ```markdown
 ![System Architecture](zomato-system-architecture.png)
 ```
